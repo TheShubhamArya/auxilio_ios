@@ -7,25 +7,96 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		431DBEB5279E414F00F0FA7F /* LabelButtonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 431DBEB4279E414F00F0FA7F /* LabelButtonCell.swift */; };
+		431DBEB7279E4A6300F0FA7F /* SwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 431DBEB6279E4A6300F0FA7F /* SwitchCell.swift */; };
+		431DBEBA279E4FB000F0FA7F /* IQKeyboardManagerSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 431DBEB9279E4FB000F0FA7F /* IQKeyboardManagerSwift */; };
+		431DBEBC279E508000F0FA7F /* CreateButtonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 431DBEBB279E508000F0FA7F /* CreateButtonCell.swift */; };
+		431DBEBE279E5A1400F0FA7F /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 431DBEBD279E5A1400F0FA7F /* Alert.swift */; };
+		431DBEC1279E5A9C00F0FA7F /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 431DBEC0279E5A9C00F0FA7F /* Enums.swift */; };
+		4323A7FC27A0CE280060F2F5 /* JobDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4323A7FB27A0CE280060F2F5 /* JobDetailVC.swift */; };
+		4323A7FF27A0CF720060F2F5 /* JobImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4323A7FE27A0CF720060F2F5 /* JobImageCell.swift */; };
+		4323A80127A35BB70060F2F5 /* DetailLabelCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4323A80027A35BB70060F2F5 /* DetailLabelCell.swift */; };
+		4323A80527A37E190060F2F5 /* RoundButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4323A80427A37E190060F2F5 /* RoundButton.swift */; };
+		4323A80727A383FA0060F2F5 /* BottomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4323A80627A383FA0060F2F5 /* BottomView.swift */; };
 		43B3D8EB27850E2800E0D2C7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B3D8EA27850E2800E0D2C7 /* AppDelegate.swift */; };
 		43B3D8ED27850E2800E0D2C7 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B3D8EC27850E2800E0D2C7 /* SceneDelegate.swift */; };
-		43B3D8EF27850E2800E0D2C7 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B3D8EE27850E2800E0D2C7 /* ViewController.swift */; };
+		43B3D8EF27850E2800E0D2C7 /* HomeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B3D8EE27850E2800E0D2C7 /* HomeVC.swift */; };
 		43B3D8F227850E2800E0D2C7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 43B3D8F027850E2800E0D2C7 /* Main.storyboard */; };
 		43B3D8F527850E2800E0D2C7 /* auxilio_ios.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 43B3D8F327850E2800E0D2C7 /* auxilio_ios.xcdatamodeld */; };
 		43B3D8F727850E2A00E0D2C7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43B3D8F627850E2A00E0D2C7 /* Assets.xcassets */; };
 		43B3D8FA27850E2A00E0D2C7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 43B3D8F827850E2A00E0D2C7 /* LaunchScreen.storyboard */; };
+		43B3D904278510C300E0D2C7 /* JobFeedVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B3D903278510C300E0D2C7 /* JobFeedVC.swift */; };
+		43B3D906278510F600E0D2C7 /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B3D905278510F600E0D2C7 /* MainTabBarController.swift */; };
+		43B3D908278511E100E0D2C7 /* ProfileVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B3D907278511E100E0D2C7 /* ProfileVC.swift */; };
+		43B3D90E278519F800E0D2C7 /* JobPostingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B3D90D278519F800E0D2C7 /* JobPostingCell.swift */; };
+		43B3D91127851A5700E0D2C7 /* AddSubviews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B3D91027851A5700E0D2C7 /* AddSubviews.swift */; };
+		43B3D9132785240900E0D2C7 /* JobDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B3D9122785240900E0D2C7 /* JobDetails.swift */; };
+		43B3D915278527C700E0D2C7 /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B3D914278527C700E0D2C7 /* Double.swift */; };
+		43B3D9192785457600E0D2C7 /* ProfileCardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B3D9182785457600E0D2C7 /* ProfileCardCell.swift */; };
+		43B3D91B278552E800E0D2C7 /* HeaderWithTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B3D91A278552E800E0D2C7 /* HeaderWithTextView.swift */; };
+		43B3D9202786235D00E0D2C7 /* HomeInfoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B3D91F2786235D00E0D2C7 /* HomeInfoCell.swift */; };
+		43B3D922278628EE00E0D2C7 /* GetStartedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B3D921278628EE00E0D2C7 /* GetStartedCell.swift */; };
+		43B3D9242786367900E0D2C7 /* HomeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B3D9232786367900E0D2C7 /* HomeModel.swift */; };
+		43B3D926278638F300E0D2C7 /* HomeHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B3D925278638F300E0D2C7 /* HomeHeaderView.swift */; };
+		43B3D9282786562700E0D2C7 /* UserJobPostingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B3D9272786562700E0D2C7 /* UserJobPostingCell.swift */; };
+		43B3D92A27878DD300E0D2C7 /* TextFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B3D92927878DD300E0D2C7 /* TextFieldCell.swift */; };
+		43B3D92D27878F4500E0D2C7 /* TextViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B3D92C27878F4500E0D2C7 /* TextViewCell.swift */; };
+		43B3D92F2787A17700E0D2C7 /* CreatePostCVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B3D92E2787A17700E0D2C7 /* CreatePostCVC.swift */; };
+		43B3D9312787A89100E0D2C7 /* DateCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B3D9302787A89100E0D2C7 /* DateCell.swift */; };
+		43B3D9332787CB7000E0D2C7 /* TextCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B3D9322787CB7000E0D2C7 /* TextCell.swift */; };
+		43B3D9352787CEBC00E0D2C7 /* ImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B3D9342787CEBC00E0D2C7 /* ImageCell.swift */; };
+		43BDF056279F885400D5296C /* LabelAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43BDF055279F885400D5296C /* LabelAttributes.swift */; };
+		43BDF058279F8BA800D5296C /* SigninTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43BDF057279F8BA800D5296C /* SigninTVC.swift */; };
+		43BDF05B279F8F1100D5296C /* TextFieldTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43BDF05A279F8F1100D5296C /* TextFieldTableCell.swift */; };
+		43BDF05D279F930800D5296C /* TextFieldAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43BDF05C279F930800D5296C /* TextFieldAttributes.swift */; };
+		43BDF05F279F985E00D5296C /* RegisterTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43BDF05E279F985E00D5296C /* RegisterTVC.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		431DBEB4279E414F00F0FA7F /* LabelButtonCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelButtonCell.swift; sourceTree = "<group>"; };
+		431DBEB6279E4A6300F0FA7F /* SwitchCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwitchCell.swift; sourceTree = "<group>"; };
+		431DBEBB279E508000F0FA7F /* CreateButtonCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateButtonCell.swift; sourceTree = "<group>"; };
+		431DBEBD279E5A1400F0FA7F /* Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
+		431DBEC0279E5A9C00F0FA7F /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
+		4323A7FB27A0CE280060F2F5 /* JobDetailVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobDetailVC.swift; sourceTree = "<group>"; };
+		4323A7FE27A0CF720060F2F5 /* JobImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobImageCell.swift; sourceTree = "<group>"; };
+		4323A80027A35BB70060F2F5 /* DetailLabelCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailLabelCell.swift; sourceTree = "<group>"; };
+		4323A80427A37E190060F2F5 /* RoundButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundButton.swift; sourceTree = "<group>"; };
+		4323A80627A383FA0060F2F5 /* BottomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomView.swift; sourceTree = "<group>"; };
 		43B3D8E727850E2800E0D2C7 /* auxilio_ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = auxilio_ios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		43B3D8EA27850E2800E0D2C7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		43B3D8EC27850E2800E0D2C7 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		43B3D8EE27850E2800E0D2C7 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		43B3D8EE27850E2800E0D2C7 /* HomeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeVC.swift; sourceTree = "<group>"; };
 		43B3D8F127850E2800E0D2C7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		43B3D8F427850E2800E0D2C7 /* auxilio_ios.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = auxilio_ios.xcdatamodel; sourceTree = "<group>"; };
 		43B3D8F627850E2A00E0D2C7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		43B3D8F927850E2A00E0D2C7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		43B3D8FB27850E2A00E0D2C7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		43B3D903278510C300E0D2C7 /* JobFeedVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobFeedVC.swift; sourceTree = "<group>"; };
+		43B3D905278510F600E0D2C7 /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
+		43B3D907278511E100E0D2C7 /* ProfileVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileVC.swift; sourceTree = "<group>"; };
+		43B3D90D278519F800E0D2C7 /* JobPostingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobPostingCell.swift; sourceTree = "<group>"; };
+		43B3D91027851A5700E0D2C7 /* AddSubviews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSubviews.swift; sourceTree = "<group>"; };
+		43B3D9122785240900E0D2C7 /* JobDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobDetails.swift; sourceTree = "<group>"; };
+		43B3D914278527C700E0D2C7 /* Double.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Double.swift; sourceTree = "<group>"; };
+		43B3D9182785457600E0D2C7 /* ProfileCardCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileCardCell.swift; sourceTree = "<group>"; };
+		43B3D91A278552E800E0D2C7 /* HeaderWithTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderWithTextView.swift; sourceTree = "<group>"; };
+		43B3D91F2786235D00E0D2C7 /* HomeInfoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeInfoCell.swift; sourceTree = "<group>"; };
+		43B3D921278628EE00E0D2C7 /* GetStartedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetStartedCell.swift; sourceTree = "<group>"; };
+		43B3D9232786367900E0D2C7 /* HomeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeModel.swift; sourceTree = "<group>"; };
+		43B3D925278638F300E0D2C7 /* HomeHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeHeaderView.swift; sourceTree = "<group>"; };
+		43B3D9272786562700E0D2C7 /* UserJobPostingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserJobPostingCell.swift; sourceTree = "<group>"; };
+		43B3D92927878DD300E0D2C7 /* TextFieldCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldCell.swift; sourceTree = "<group>"; };
+		43B3D92C27878F4500E0D2C7 /* TextViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextViewCell.swift; sourceTree = "<group>"; };
+		43B3D92E2787A17700E0D2C7 /* CreatePostCVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePostCVC.swift; sourceTree = "<group>"; };
+		43B3D9302787A89100E0D2C7 /* DateCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateCell.swift; sourceTree = "<group>"; };
+		43B3D9322787CB7000E0D2C7 /* TextCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextCell.swift; sourceTree = "<group>"; };
+		43B3D9342787CEBC00E0D2C7 /* ImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCell.swift; sourceTree = "<group>"; };
+		43BDF055279F885400D5296C /* LabelAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelAttributes.swift; sourceTree = "<group>"; };
+		43BDF057279F8BA800D5296C /* SigninTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SigninTVC.swift; sourceTree = "<group>"; };
+		43BDF05A279F8F1100D5296C /* TextFieldTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldTableCell.swift; sourceTree = "<group>"; };
+		43BDF05C279F930800D5296C /* TextFieldAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldAttributes.swift; sourceTree = "<group>"; };
+		43BDF05E279F985E00D5296C /* RegisterTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterTVC.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -33,12 +104,41 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				431DBEBA279E4FB000F0FA7F /* IQKeyboardManagerSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		431DBEBF279E5A8500F0FA7F /* Utility */ = {
+			isa = PBXGroup;
+			children = (
+				431DBEC0279E5A9C00F0FA7F /* Enums.swift */,
+				4323A80427A37E190060F2F5 /* RoundButton.swift */,
+			);
+			path = Utility;
+			sourceTree = "<group>";
+		};
+		4323A7FD27A0CF4A0060F2F5 /* Job Detail */ = {
+			isa = PBXGroup;
+			children = (
+				4323A7FE27A0CF720060F2F5 /* JobImageCell.swift */,
+				4323A80027A35BB70060F2F5 /* DetailLabelCell.swift */,
+				4323A80627A383FA0060F2F5 /* BottomView.swift */,
+			);
+			path = "Job Detail";
+			sourceTree = "<group>";
+		};
+		4323A80827A3AA790060F2F5 /* Authentication */ = {
+			isa = PBXGroup;
+			children = (
+				43BDF05E279F985E00D5296C /* RegisterTVC.swift */,
+				43BDF057279F8BA800D5296C /* SigninTVC.swift */,
+			);
+			path = Authentication;
+			sourceTree = "<group>";
+		};
 		43B3D8DE27850E2800E0D2C7 = {
 			isa = PBXGroup;
 			children = (
@@ -58,9 +158,12 @@
 		43B3D8E927850E2800E0D2C7 /* auxilio_ios */ = {
 			isa = PBXGroup;
 			children = (
-				43B3D8EA27850E2800E0D2C7 /* AppDelegate.swift */,
-				43B3D8EC27850E2800E0D2C7 /* SceneDelegate.swift */,
-				43B3D8EE27850E2800E0D2C7 /* ViewController.swift */,
+				431DBEBF279E5A8500F0FA7F /* Utility */,
+				43B3D90F27851A2E00E0D2C7 /* Extensions */,
+				43B3D90C278519C200E0D2C7 /* AppAndSceneDelegates */,
+				43B3D9092785198900E0D2C7 /* Model */,
+				43B3D90A2785199C00E0D2C7 /* View */,
+				43B3D90B278519A100E0D2C7 /* Controller */,
 				43B3D8F027850E2800E0D2C7 /* Main.storyboard */,
 				43B3D8F627850E2A00E0D2C7 /* Assets.xcassets */,
 				43B3D8F827850E2A00E0D2C7 /* LaunchScreen.storyboard */,
@@ -68,6 +171,114 @@
 				43B3D8F327850E2800E0D2C7 /* auxilio_ios.xcdatamodeld */,
 			);
 			path = auxilio_ios;
+			sourceTree = "<group>";
+		};
+		43B3D9092785198900E0D2C7 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				43B3D9122785240900E0D2C7 /* JobDetails.swift */,
+				43B3D9232786367900E0D2C7 /* HomeModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		43B3D90A2785199C00E0D2C7 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				4323A7FD27A0CF4A0060F2F5 /* Job Detail */,
+				43BDF059279F8EF300D5296C /* Authentication */,
+				43B3D92B27878DDB00E0D2C7 /* Create Post */,
+				43B3D91E2786234200E0D2C7 /* Home */,
+				43B3D9172785455A00E0D2C7 /* Profile */,
+				43B3D9162785454E00E0D2C7 /* Job Feed */,
+				43B3D91A278552E800E0D2C7 /* HeaderWithTextView.swift */,
+				43B3D925278638F300E0D2C7 /* HomeHeaderView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		43B3D90B278519A100E0D2C7 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				4323A80827A3AA790060F2F5 /* Authentication */,
+				43B3D8EE27850E2800E0D2C7 /* HomeVC.swift */,
+				43B3D903278510C300E0D2C7 /* JobFeedVC.swift */,
+				43B3D907278511E100E0D2C7 /* ProfileVC.swift */,
+				43B3D905278510F600E0D2C7 /* MainTabBarController.swift */,
+				43B3D92E2787A17700E0D2C7 /* CreatePostCVC.swift */,
+				4323A7FB27A0CE280060F2F5 /* JobDetailVC.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		43B3D90C278519C200E0D2C7 /* AppAndSceneDelegates */ = {
+			isa = PBXGroup;
+			children = (
+				43B3D8EA27850E2800E0D2C7 /* AppDelegate.swift */,
+				43B3D8EC27850E2800E0D2C7 /* SceneDelegate.swift */,
+			);
+			path = AppAndSceneDelegates;
+			sourceTree = "<group>";
+		};
+		43B3D90F27851A2E00E0D2C7 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				43B3D91027851A5700E0D2C7 /* AddSubviews.swift */,
+				43B3D914278527C700E0D2C7 /* Double.swift */,
+				431DBEBD279E5A1400F0FA7F /* Alert.swift */,
+				43BDF055279F885400D5296C /* LabelAttributes.swift */,
+				43BDF05C279F930800D5296C /* TextFieldAttributes.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		43B3D9162785454E00E0D2C7 /* Job Feed */ = {
+			isa = PBXGroup;
+			children = (
+				43B3D90D278519F800E0D2C7 /* JobPostingCell.swift */,
+			);
+			path = "Job Feed";
+			sourceTree = "<group>";
+		};
+		43B3D9172785455A00E0D2C7 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				43B3D9182785457600E0D2C7 /* ProfileCardCell.swift */,
+				43B3D9272786562700E0D2C7 /* UserJobPostingCell.swift */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
+		43B3D91E2786234200E0D2C7 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				43B3D91F2786235D00E0D2C7 /* HomeInfoCell.swift */,
+				43B3D921278628EE00E0D2C7 /* GetStartedCell.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		43B3D92B27878DDB00E0D2C7 /* Create Post */ = {
+			isa = PBXGroup;
+			children = (
+				43B3D92927878DD300E0D2C7 /* TextFieldCell.swift */,
+				43B3D92C27878F4500E0D2C7 /* TextViewCell.swift */,
+				43B3D9302787A89100E0D2C7 /* DateCell.swift */,
+				43B3D9322787CB7000E0D2C7 /* TextCell.swift */,
+				43B3D9342787CEBC00E0D2C7 /* ImageCell.swift */,
+				431DBEB4279E414F00F0FA7F /* LabelButtonCell.swift */,
+				431DBEB6279E4A6300F0FA7F /* SwitchCell.swift */,
+				431DBEBB279E508000F0FA7F /* CreateButtonCell.swift */,
+			);
+			path = "Create Post";
+			sourceTree = "<group>";
+		};
+		43BDF059279F8EF300D5296C /* Authentication */ = {
+			isa = PBXGroup;
+			children = (
+				43BDF05A279F8F1100D5296C /* TextFieldTableCell.swift */,
+			);
+			path = Authentication;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -86,6 +297,9 @@
 			dependencies = (
 			);
 			name = auxilio_ios;
+			packageProductDependencies = (
+				431DBEB9279E4FB000F0FA7F /* IQKeyboardManagerSwift */,
+			);
 			productName = auxilio_ios;
 			productReference = 43B3D8E727850E2800E0D2C7 /* auxilio_ios.app */;
 			productType = "com.apple.product-type.application";
@@ -114,6 +328,9 @@
 				Base,
 			);
 			mainGroup = 43B3D8DE27850E2800E0D2C7;
+			packageReferences = (
+				431DBEB8279E4FB000F0FA7F /* XCRemoteSwiftPackageReference "IQKeyboardManager" */,
+			);
 			productRefGroup = 43B3D8E827850E2800E0D2C7 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -141,10 +358,45 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				43B3D8EF27850E2800E0D2C7 /* ViewController.swift in Sources */,
+				43B3D8EF27850E2800E0D2C7 /* HomeVC.swift in Sources */,
+				43B3D91127851A5700E0D2C7 /* AddSubviews.swift in Sources */,
+				43B3D9242786367900E0D2C7 /* HomeModel.swift in Sources */,
+				43BDF05F279F985E00D5296C /* RegisterTVC.swift in Sources */,
+				43B3D9192785457600E0D2C7 /* ProfileCardCell.swift in Sources */,
+				43BDF05D279F930800D5296C /* TextFieldAttributes.swift in Sources */,
+				43B3D92A27878DD300E0D2C7 /* TextFieldCell.swift in Sources */,
+				43B3D922278628EE00E0D2C7 /* GetStartedCell.swift in Sources */,
 				43B3D8F527850E2800E0D2C7 /* auxilio_ios.xcdatamodeld in Sources */,
+				43B3D906278510F600E0D2C7 /* MainTabBarController.swift in Sources */,
+				43B3D9312787A89100E0D2C7 /* DateCell.swift in Sources */,
+				43B3D9352787CEBC00E0D2C7 /* ImageCell.swift in Sources */,
+				43B3D926278638F300E0D2C7 /* HomeHeaderView.swift in Sources */,
+				43B3D9202786235D00E0D2C7 /* HomeInfoCell.swift in Sources */,
+				43B3D92D27878F4500E0D2C7 /* TextViewCell.swift in Sources */,
+				4323A80527A37E190060F2F5 /* RoundButton.swift in Sources */,
+				431DBEC1279E5A9C00F0FA7F /* Enums.swift in Sources */,
+				43B3D91B278552E800E0D2C7 /* HeaderWithTextView.swift in Sources */,
+				4323A80727A383FA0060F2F5 /* BottomView.swift in Sources */,
+				43B3D92F2787A17700E0D2C7 /* CreatePostCVC.swift in Sources */,
+				43B3D908278511E100E0D2C7 /* ProfileVC.swift in Sources */,
+				431DBEB7279E4A6300F0FA7F /* SwitchCell.swift in Sources */,
+				4323A80127A35BB70060F2F5 /* DetailLabelCell.swift in Sources */,
+				431DBEBE279E5A1400F0FA7F /* Alert.swift in Sources */,
+				4323A7FF27A0CF720060F2F5 /* JobImageCell.swift in Sources */,
+				43B3D9132785240900E0D2C7 /* JobDetails.swift in Sources */,
+				4323A7FC27A0CE280060F2F5 /* JobDetailVC.swift in Sources */,
+				431DBEBC279E508000F0FA7F /* CreateButtonCell.swift in Sources */,
+				43BDF05B279F8F1100D5296C /* TextFieldTableCell.swift in Sources */,
+				43B3D9282786562700E0D2C7 /* UserJobPostingCell.swift in Sources */,
+				43BDF056279F885400D5296C /* LabelAttributes.swift in Sources */,
+				43B3D90E278519F800E0D2C7 /* JobPostingCell.swift in Sources */,
 				43B3D8EB27850E2800E0D2C7 /* AppDelegate.swift in Sources */,
 				43B3D8ED27850E2800E0D2C7 /* SceneDelegate.swift in Sources */,
+				43B3D915278527C700E0D2C7 /* Double.swift in Sources */,
+				431DBEB5279E414F00F0FA7F /* LabelButtonCell.swift in Sources */,
+				43BDF058279F8BA800D5296C /* SigninTVC.swift in Sources */,
+				43B3D9332787CB7000E0D2C7 /* TextCell.swift in Sources */,
+				43B3D904278510C300E0D2C7 /* JobFeedVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -296,16 +548,21 @@
 				DEVELOPMENT_TEAM = PXJDJW8Z9X;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = auxilio_ios/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Auxilio;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Please allow Auxilio to use your camera for you to take pictures for your post.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Please allow Auxilio to add photos to your photo library for you to use later.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Please allow Auxilio to access your photo library for you to access your photos to create a post.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Shubhamarya.auxilio-ios";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -324,16 +581,21 @@
 				DEVELOPMENT_TEAM = PXJDJW8Z9X;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = auxilio_ios/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Auxilio;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Please allow Auxilio to use your camera for you to take pictures for your post.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Please allow Auxilio to add photos to your photo library for you to use later.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Please allow Auxilio to access your photo library for you to access your photos to create a post.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Shubhamarya.auxilio-ios";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -364,6 +626,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		431DBEB8279E4FB000F0FA7F /* XCRemoteSwiftPackageReference "IQKeyboardManager" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hackiftekhar/IQKeyboardManager.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		431DBEB9279E4FB000F0FA7F /* IQKeyboardManagerSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 431DBEB8279E4FB000F0FA7F /* XCRemoteSwiftPackageReference "IQKeyboardManager" */;
+			productName = IQKeyboardManagerSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		43B3D8F327850E2800E0D2C7 /* auxilio_ios.xcdatamodeld */ = {
