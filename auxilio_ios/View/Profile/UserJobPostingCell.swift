@@ -32,10 +32,22 @@ class UserJobPostingCell: JobPostingCell {
         layoutElements()
     }
     
-    func configureStatusLabel(at indexPath: IndexPath){
-        configure(at: indexPath)
-        statusLabel.text = "Completed"
-        statusLabel.backgroundColor = .systemGreen
+    func configureStatusLabel(with post: PostDetails){
+        configure(for: post)
+        statusLabel.text = post.postStatus
+        var color = UIColor.systemYellow
+        if PostStatus.drafted.rawValue == post.postStatus {
+            color = UIColor.systemYellow
+        } else if PostStatus.inProcess.rawValue == post.postStatus {
+            color = UIColor.orange
+        } else if PostStatus.completed.rawValue == post.postStatus {
+            color = UIColor.systemGreen
+        } else if PostStatus.notPicked.rawValue == post.postStatus {
+            color = UIColor.systemBlue
+        } else if PostStatus.error.rawValue == post.postStatus {
+            color = UIColor.systemRed
+        }
+        statusLabel.backgroundColor = color
         
     }
     

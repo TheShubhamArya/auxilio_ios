@@ -11,17 +11,8 @@ class DetailLabelCell: UICollectionViewCell {
     
     static let identifier = "DetailLabelCellIdentifier"
     
-//    private let titleLabel : UILabel = {
-//        let label = UILabel()
-//        label.numberOfLines = 0
-//        label.text = "Something short for now Something short for now Something short for now Something short for now  Something short for now Something short for now Something short for now Something short for no Something short for now Something short for now Something short for now Something short for no Something short for now Something short for now Something short for now Something short for no Something short for now Something short for now Something short for now Something short for now  Something short for now Something short for now Something short for now Something short for no Something short for now Something short for now Something short for now Something short for no Something short for now Something short for now Something short for now Something short for no Something short for now Something short for now Something short for now Something short for now  Something short for now Something short for now Something short for now Something short for no Something short for now Something short for now Something short for now Something short for no Something short for now Something short for now Something short for now Something short for no"
-//        return label
-//    }()
-    
-    
     private let titleLabel : UILabel = {
         let label = UILabel()
-        label.text = "Title"
         label.numberOfLines = 0
         label.font = UIFont.boldSystemFont(ofSize: 21)
         return label
@@ -32,7 +23,6 @@ class DetailLabelCell: UICollectionViewCell {
         label.numberOfLines = 0
         label.font = UIFont.systemFont(ofSize: 15, weight: .regular)
         label.textColor = .secondaryLabel
-        label.text = "Description Something short for now Something short for now Something short for now Something short for now  Something short for now Something short for now. Description Something short for now Something short for now Something short for now Something short for now  Something short for now Something short for now."
         return label
     }()
     
@@ -40,7 +30,6 @@ class DetailLabelCell: UICollectionViewCell {
         let label = UILabel()
         label.numberOfLines = 0
         label.textColor = .systemBlue
-        label.text = "Jan 20, 2022 at 8:00pm to Jan 27, 2022 at 8pm"
         return label
     }()
     
@@ -61,6 +50,18 @@ class DetailLabelCell: UICollectionViewCell {
         return label
     }()
     
+    private let userProfileImageView : UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(systemName: "person")
+        imageView.contentMode = .scaleAspectFit
+        return imageView
+    }()
+    
+    private let usernameLabel : UILabel = {
+        let label = UILabel()
+        return label
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.addSubViews(verticalStack)
@@ -75,6 +76,16 @@ class DetailLabelCell: UICollectionViewCell {
         verticalStack.addArrangedSubview(descriptionLabel)
         verticalStack.addArrangedSubview(datesLabel)
         verticalStack.addArrangedSubview(privacyDescriptionLabel)
+    }
+    
+    public func configure(with post: PostDetails) {
+        titleLabel.text = post.name
+        descriptionLabel.text = post.description
+        datesLabel.text = "\(post.startDate) to \(post.endDate)"
+        if post.pickedBy != "none" {
+            privacyDescriptionLabel.removeFromSuperview()
+        }
+        
     }
     
     required init?(coder: NSCoder) {

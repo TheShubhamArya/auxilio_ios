@@ -6,23 +6,128 @@
 //
 
 import UIKit
+import Firebase
 
-enum JobAction: Int {
-    case posted
-    case picked
-}
-
-class ProfileVC: UIViewController {
+class ProfileVC: UIViewController{
     
     var collectionView : UICollectionView!
     var segmentControl : UISegmentedControl!
     var segment = 0
     let items = ["Posted","Picked", "Saved"]
+    var user = UserDetails()
+    var posts = [[PostDetails]](repeating: [PostDetails](), count: 3)
+    let auth = Auth.auth()
+    let db = Firestore.firestore()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupNavbar()
         setupCollectionView()
+        accessCurrentUserInfo()
+        accessAllJobsRelatedToUser()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        user.postsSaved = AllPosts.savedPosts
+        user.postsPicked = AllPosts.pickedPosts
+        user.postsCreated = AllPosts.createdPosts
+        accessAllJobsRelatedToUser()
+    }
+    
+    func accessCurrentUserInfo() {
+        let docRef = db.collection(User.collectionName).document(auth.currentUser!.uid)
+        docRef.getDocument { (document, error) in
+            if let document = document, document.exists {
+                let data = document.data()
+                if let name = data![User.name] as? String,
+                   let mobile = data![User.mobile] as? String,
+                   let email = data![User.email] as? String,
+                   let address = data![User.address] as? String,
+                   let dob = data![User.dob] as? String,
+                   let postsCreated = data![User.postsCreated] as? [String],
+                   let postsPicked = data![User.postsPicked] as? [String],
+                   let postsSaved = data![User.postsSaved] as? [String],
+                   let imageURL = data![User.imageURL] as? String{
+                    self.user.name = name
+                    self.user.mobile = mobile
+                    self.user.email = email
+                    self.user.address = address
+                    self.user.dob = dob
+                    self.user.postsCreated = postsCreated
+                    self.user.postsPicked = postsPicked
+                    self.user.postsSaved = postsSaved
+                    self.user.imageURL = imageURL
+                    DispatchQueue.main.async {
+                        self.accessAllJobsRelatedToUser()
+                        self.collectionView.reloadData()
+                    }
+                }
+            } else {
+                print("Document does not exist")
+            }
+        }
+    }
+    
+    func accessAllJobsRelatedToUser() {
+        db.collection(Post.collectionName).getDocuments() { (querySnapshot, err) in
+            if let err = err {
+                print("Error getting documents: \(err)")
+            } else {
+                self.posts[UserPost.created.rawValue] = []
+                self.posts[UserPost.picked.rawValue] = []
+                self.posts[UserPost.saved.rawValue] = []
+                for document in querySnapshot!.documents {
+                    let data = document.data()
+                    if AllPosts.createdPosts.contains((data[Post.post_id] as? String)!) {
+                        let post = self.checkPostData(with: data)
+                        self.posts[UserPost.created.rawValue].append(post)
+                    } else if AllPosts.pickedPosts.contains((data[Post.post_id] as? String)!) {
+                        let post = self.checkPostData(with: data)
+                        self.posts[UserPost.picked.rawValue].append(post)
+                    }
+                    if AllPosts.savedPosts.contains((data[Post.post_id] as? String)!) {
+                        let post = self.checkPostData(with: data)
+                        self.posts[UserPost.saved.rawValue].append(post)
+                    }
+                }
+                DispatchQueue.main.async {
+                    self.collectionView.reloadData()
+                }
+            }
+        }
+    }
+    
+    func checkPostData(with data: [String : Any]) -> PostDetails {
+        var post = PostDetails()
+        if let title = data[Post.title] as? String,
+           let description = data[Post.description] as? String,
+           let rate = data[Post.rate] as? String,
+           let amount = data[Post.amount] as? Double,
+           let startDate = data[Post.startDate] as? String,
+           let endData = data[Post.endDate] as? String,
+           let location = data[Post.location] as? String,
+           let taskType = data[Post.taskType] as? String,
+           let privacyAccess = data[Post.privacyAccess] as? Bool,
+           let post_id = data[Post.post_id] as? String,
+           let postedBy = data[Post.postedBy] as? String,
+           let imageUrls = data[Post.imageURLs] as? [String],
+           let pickedBy = data[Post.pickedBy] as? String{
+            post.name = title
+            post.description = description
+            post.rate = rate
+            post.amount = amount
+            post.startDate = startDate
+            post.endDate = endData
+            post.location = location
+            post.taskType = taskType
+            post.allowLocationContactAccess = privacyAccess
+            post.post_id = post_id
+            post.postedBy = postedBy
+            post.imageURLs = imageUrls
+            post.pickedBy = pickedBy
+        }
+        return post
     }
     
     func setupNavbar(){
@@ -37,6 +142,8 @@ class ProfileVC: UIViewController {
         
         let settingButton = UIBarButtonItem(image: UIImage(systemName: "gear"), style: .plain, target: self, action: #selector(moveToSettings))
         navigationItem.rightBarButtonItem = settingButton
+        let logoutButton = UIBarButtonItem(image: UIImage(systemName: "power"), style: .plain, target: self, action: #selector(logoutAction))
+        navigationItem.leftBarButtonItem = logoutButton
         
         let searchController = UISearchController()
         searchController.isActive = true
@@ -56,10 +163,48 @@ class ProfileVC: UIViewController {
         }
     }
     
+    @objc func logoutAction() {
+        let alertController = UIAlertController(title: "Log Out", message: "", preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "Yes, Log Out", style: .destructive, handler: {
+            _ -> Void in
+            do {
+                try self.auth.signOut()
+                DispatchQueue.main.async {
+                    let vc = HomeVC()
+                    let navVC = UINavigationController(rootViewController: vc)
+                    navVC.modalPresentationStyle = .fullScreen
+                    self.present(navVC, animated: true, completion: nil)
+                }
+            } catch let signOutError as NSError {
+                print("Error signing out: %@", signOutError)
+            }
+        }))
+        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
     @objc func moveToSettings() {
         
     }
+    
+    @objc func moveToEditProfileVC() {
+        let vc = EditProfileVC()
+        vc.editProfileDelegate = self
+        vc.user = user
+        vc.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(vc, animated: true)
+    }
 
+}
+
+extension ProfileVC : EditProfileDelegate {
+    func didEditInfo(of user: UserDetails) {
+        self.user = user
+        print("did edit info")
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+        }
+    }
 }
 
 extension ProfileVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
@@ -89,7 +234,7 @@ extension ProfileVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSou
         if section == 0 {
             return 1
         } else {
-            return 4
+            return posts[segment].count
         }
     }
     
@@ -98,24 +243,28 @@ extension ProfileVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSou
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if indexPath.section == 1 {
+            let vc = JobDetailVC()
+            vc.post = posts[segment][indexPath.item]
+            vc.jobPickedDelegate = self
+            vc.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(vc, animated: true)
+        }
     
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if indexPath.section == 0 {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ProfileCardCell.identifier, for: indexPath) as? ProfileCardCell else {return UICollectionViewCell()}
-            cell.configure()
+            cell.configure(with: user)
+            cell.editButton.addTarget(self, action: #selector(moveToEditProfileVC), for: .touchUpInside)
             return cell
         } else {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: UserJobPostingCell.identifier, for: indexPath) as? UserJobPostingCell else {return UICollectionViewCell()}
-            cell.configureStatusLabel(at: indexPath)
+            cell.configureStatusLabel(with: posts[segment][indexPath.item])
             return cell
         }
     }
-    
-//    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-//        return UIContextMenuConfiguration()
-//    }
 
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         
@@ -145,7 +294,7 @@ extension ProfileVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSou
             
             item.contentInsets = NSDirectionalEdgeInsets(top: 5, leading: 7, bottom: 5, trailing: 7)
             
-            var groupHeight = sectionIndex == 0 ? NSCollectionLayoutDimension.fractionalHeight(0.25) : NSCollectionLayoutDimension.fractionalHeight(0.15)
+            var groupHeight = sectionIndex == 0 ? NSCollectionLayoutDimension.fractionalHeight(0.25) : NSCollectionLayoutDimension.absolute(120)
             var groupWidth =  NSCollectionLayoutDimension.fractionalWidth(1)
             
             if self.collectionView.frame.size.width > 500 || self.collectionView.frame.size.height > 1000{
@@ -160,21 +309,11 @@ extension ProfileVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSou
             
             let section = NSCollectionLayoutSection(group: group)
             
-//            if sectionIndex == 0 {
-//                section.orthogonalScrollingBehavior = .groupPaging
-//                section.contentInsets = NSDirectionalEdgeInsets(top: 20, leading: 8, bottom: 5, trailing: 8)
-//            } else if sectionIndex == 4{
-//                section.orthogonalScrollingBehavior = .groupPaging
-//                let layoutSectionHeader = self.createSectionHeader(with: sectionIndex)
-//                section.boundarySupplementaryItems = [layoutSectionHeader]
-//                section.contentInsets = NSDirectionalEdgeInsets(top: 5, leading: 8, bottom: 5, trailing: 8)
-//            } else {
             if sectionIndex == 1{
                 let layoutSectionHeader = self.createSectionHeader(with: sectionIndex)
                 section.boundarySupplementaryItems = [layoutSectionHeader]
                 section.contentInsets = NSDirectionalEdgeInsets(top: 5, leading: 8, bottom: 5, trailing: 8)
             }
-//            }
             return section
         }
         return layout
@@ -185,6 +324,12 @@ extension ProfileVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSou
 
         let layoutSectionHeader = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: layoutSectionHeaderSize, elementKind: UICollectionView.elementKindSectionHeader, alignment: .top)
         return layoutSectionHeader
+    }
+}
+
+extension ProfileVC : JobPickedDelegate {
+    func didPickJob(_ isPicked: Bool) {
+        
     }
 }
 

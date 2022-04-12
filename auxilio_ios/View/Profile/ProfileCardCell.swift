@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Firebase
 
 class ProfileCardCell: UICollectionViewCell {
     
@@ -95,50 +96,37 @@ class ProfileCardCell: UICollectionViewCell {
         verticalStack.addArrangedSubview(mobileLabel)
         verticalStack.addArrangedSubview(addressLabel)
         verticalStack.addArrangedSubview(editButton)
-//        contentView.addSubViews(profilePicture, usernameLabel, emailLabel, mobileLabel, addressLabel, editButton)
-        
     }
     
-    func configure() {
-        profilePicture.image = UIImage(named: "profile")
-        usernameLabel.text = "Shubham Arya"
-        emailLabel.text = "shubham.arya@mavs.uta.edu"
-        mobileLabel.text = "682-216-7780"
-        addressLabel.text = "400 Kerby St Apt 206,\nArlington, TX - 76013"
+    func configure(with user: UserDetails) {
+        if profilePicture.image == nil {
+            profilePicture.image = UIImage(systemName: "person")?.withTintColor(.systemGray)
+        }
+//        if let url = URL(string: user.imageURL) {
+//            let task = URLSession.shared.dataTask(with: url, completionHandler: { data, _, error in
+//                if let data = data, error == nil {
+//                    DispatchQueue.main.async(execute: { () -> Void in
+//                        let image = UIImage(data: data)
+//                        self.profilePicture.image = image
+//                    })
+//                }
+//            })
+//            task.resume()
+//        }
+        usernameLabel.text = user.name
+        emailLabel.text = user.email
+        mobileLabel.text = user.mobile
+        addressLabel.text = user.address
     }
     
     private func layoutElements() {
         profilePicture.translatesAutoresizingMaskIntoConstraints = false
-//        usernameLabel.translatesAutoresizingMaskIntoConstraints = false
-//        emailLabel.translatesAutoresizingMaskIntoConstraints = false
-//        mobileLabel.translatesAutoresizingMaskIntoConstraints = false
-//        addressLabel.translatesAutoresizingMaskIntoConstraints = false
         editButton.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             profilePicture.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             profilePicture.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
-            profilePicture.heightAnchor.constraint(equalToConstant: 150),
-            profilePicture.widthAnchor.constraint(equalToConstant: 120),
-            
-//            usernameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
-//            usernameLabel.leadingAnchor.constraint(equalTo: profilePicture.trailingAnchor, constant: 10),
-//            usernameLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
-//
-//            emailLabel.topAnchor.constraint(equalTo: usernameLabel.bottomAnchor, constant: 5),
-//            emailLabel.leadingAnchor.constraint(equalTo: profilePicture.trailingAnchor, constant: 10),
-//            emailLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
-//
-//            mobileLabel.topAnchor.constraint(equalTo: emailLabel.bottomAnchor, constant: 5),
-//            mobileLabel.leadingAnchor.constraint(equalTo: profilePicture.trailingAnchor, constant: 10),
-//            mobileLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
-//
-//            addressLabel.topAnchor.constraint(equalTo: mobileLabel.bottomAnchor, constant: 5),
-//            addressLabel.leadingAnchor.constraint(equalTo: profilePicture.trailingAnchor, constant: 10),
-//            addressLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
-//
-//            editButton.topAnchor.constraint(equalTo: addressLabel.bottomAnchor, constant: 5),
-//            editButton.leadingAnchor.constraint(equalTo: profilePicture.trailingAnchor, constant: 10),
-//            editButton.heightAnchor.constraint(equalToConstant: 30),
+            profilePicture.heightAnchor.constraint(equalToConstant: 100),
+            profilePicture.widthAnchor.constraint(equalToConstant: 100),
             editButton.widthAnchor.constraint(equalToConstant: 100)
             
         ])

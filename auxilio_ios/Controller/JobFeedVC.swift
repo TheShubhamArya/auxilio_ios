@@ -6,16 +6,98 @@
 //
 
 import UIKit
+import Firebase
 
 class JobFeedVC: UIViewController {
     
     var collectionView : UICollectionView!
+    let refreshControl = UIRefreshControl()
+    let auth = Auth.auth()
+    let db = Firestore.firestore()
+    var allPosts = [PostDetails]()
+    var filteredPosts = [PostDetails]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupNavbar()
         setupCollectionView()
+        refreshControl.attributedTitle = NSAttributedString(string: "Refreshing...")
+        self.refreshControl.addTarget(self, action: #selector(refresh), for: .valueChanged)
+        collectionView .insertSubview(refreshControl, at: 0)
+        
+        let docRef = db.collection(User.collectionName).document(auth.currentUser!.uid)
+        docRef.getDocument { (document, error) in
+            if let document = document, document.exists {
+                let data = document.data()
+                AllPosts.pickedPosts = data![User.postsPicked] as! [String]
+                AllPosts.savedPosts = data![User.postsSaved] as! [String]
+                AllPosts.createdPosts = data![User.postsCreated] as! [String]
+                self.accessAllJobPostings()
+            } else {
+                print("Document does not exist")
+            }
+        }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(true)
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+        }
+    }
+    
+    func accessAllJobPostings() {
+        allPosts = []
+        db.collection(Post.collectionName).getDocuments() { (querySnapshot, err) in
+            if let err = err {
+                print("Error getting documents: \(err)")
+            } else {
+                for document in querySnapshot!.documents {
+                    let data = document.data()
+                    var post = PostDetails()
+                    if ((data[Post.postedBy] as? String) != self.auth.currentUser?.uid) && (data[Post.pickedBy] as? String == "none") {
+                        if let title = data[Post.title] as? String,
+                           let description = data[Post.description] as? String,
+                           let rate = data[Post.rate] as? String,
+                           let amount = data[Post.amount] as? Double,
+                           let startDate = data[Post.startDate] as? String,
+                           let endData = data[Post.endDate] as? String,
+                           let location = data[Post.location] as? String,
+                           let taskType = data[Post.taskType] as? String,
+                           let privacyAccess = data[Post.privacyAccess] as? Bool,
+                           let post_id = data[Post.post_id] as? String,
+                           let postedBy = data[Post.postedBy] as? String,
+                           let imageUrls = data[Post.imageURLs] as? [String],
+                           let pickedBy = data[Post.pickedBy] as? String{
+                            post.name = title
+                            post.description = description
+                            post.rate = rate
+                            post.amount = amount
+                            post.startDate = startDate
+                            post.endDate = endData
+                            post.location = location
+                            post.taskType = taskType
+                            post.allowLocationContactAccess = privacyAccess
+                            post.post_id = post_id
+                            post.postedBy = postedBy
+                            post.imageURLs = imageUrls
+                            post.pickedBy = pickedBy
+                            self.allPosts.append(post)
+                            self.filteredPosts = self.allPosts
+                        }
+                    }
+                }
+                DispatchQueue.main.async {
+                    self.refreshControl.endRefreshing()
+                    self.collectionView.reloadData()
+                }
+            }
+        }
+    }
+    
+    @objc func refresh(sender:AnyObject) {
+        accessAllJobPostings()
     }
     
     func setupNavbar() {
@@ -24,39 +106,85 @@ class JobFeedVC: UIViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         
         let filterBarButton = UIBarButtonItem(image: UIImage(systemName: "slider.vertical.3"), style: .plain, target: self, action: #selector(filterAction))
-//        filterBarButton.primaryAction = nil
-//        filterBarButton.menu = filterMenu()
         navigationItem.rightBarButtonItem = filterBarButton
-//        navigationItem.rightBarButtonItem!.menu = filterMenu()
         
         let searchController = UISearchController()
         searchController.isActive = true
         searchController.searchResultsUpdater = self
         searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.delegate = self
         searchController.searchBar.placeholder = "Search jobs..."
         navigationItem.searchController = searchController
         let textFieldInsideSearchBar = searchController.searchBar.value(forKey: "searchField") as? UITextField
         textFieldInsideSearchBar?.textColor = .label
     }
     
-    private func filterMenu() -> UIMenu? {
-        let menu = UIMenu(title: "Category type", image: nil, identifier: nil, options: [], children: [
-            UIAction(title: "Select from default", image: nil, handler: { [weak self] (_) in
-                
-            }),
-            UIAction(title: "Create a custom", image: nil, handler: { [weak self] (_) in
-                
-            })
-        ])
-        return menu
-    }
-    
     @objc func filterAction() {
+        let actionSheet = UIAlertController(title: "Sort Posts", message: "", preferredStyle: .actionSheet)
         
+        let highToLow = UIAlertAction(title: "High to low", style: .default) { [weak self] _ in
+            self?.filterPosts(by: .highToLow)
+        }
+        
+        let lowToHigh = UIAlertAction(title: "Low to high", style: .default) {[weak self] _ in
+            self?.filterPosts(by: .lowToHigh)
+        }
+        
+        let service = UIAlertAction(title: "Service", style: .default) {[weak self] _ in
+            self?.filterPosts(by: .services)
+        }
+        
+        let goods = UIAlertAction(title: "Goods", style: .default) {[weak self] _ in
+            self?.filterPosts(by: .goods)
+        }
+        
+        let all = UIAlertAction(title: "All jobs", style: .default) {[weak self] _ in
+            self?.filterPosts(by: .all)
+        }
+        
+        actionSheet.addAction(highToLow)
+        actionSheet.addAction(lowToHigh)
+        actionSheet.addAction(goods)
+        actionSheet.addAction(service)
+        actionSheet.addAction(all)
+        
+        if let popoverPresentationController = actionSheet.popoverPresentationController {
+          popoverPresentationController.sourceView = self.view
+          popoverPresentationController.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
+          popoverPresentationController.permittedArrowDirections = []
+        }
+        
+        present(actionSheet, animated: true)
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
+    }
+    
+    func filterPosts(by type: Filter) {
+        switch type {
+        case .highToLow:
+            filteredPosts = allPosts.sorted(by: { post1, post2 in
+                post1.amount > post2.amount
+            })
+        case .lowToHigh:
+            filteredPosts = allPosts.sorted(by: { post1, post2 in
+                post1.amount < post2.amount
+            })
+        case .services:
+            filteredPosts = allPosts.filter({ posts in
+                posts.taskType == PostType.service.rawValue
+            })
+        case .goods:
+            filteredPosts = allPosts.filter({ posts in
+                posts.taskType == PostType.good.rawValue
+            })
+        case .all:
+            filteredPosts = allPosts
+        }
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+        }
     }
 
 }
@@ -83,7 +211,7 @@ extension JobFeedVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSou
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 6
+        return filteredPosts.count//allPosts.count
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -92,6 +220,8 @@ extension JobFeedVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSou
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let vc = JobDetailVC()
+        vc.post = filteredPosts[indexPath.item]//allPosts[indexPath.item]
+        vc.jobPickedDelegate = self
         vc.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(vc, animated: true)
     }
@@ -99,7 +229,9 @@ extension JobFeedVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSou
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if indexPath.section == 0 {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: JobPostingCell.identifier, for: indexPath) as? JobPostingCell else {return UICollectionViewCell()}
-            cell.configure(at: indexPath)
+            let post = filteredPosts[indexPath.item]//allPosts[indexPath.item]
+            cell.configure(for: post, isSaved: AllPosts.savedPosts.contains(post.post_id))
+            
             return cell
         }
         return UICollectionViewCell()
@@ -109,10 +241,10 @@ extension JobFeedVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSou
         if indexPath.section == 0 {
             return UIContextMenuConfiguration(identifier: "\(indexPath.row)" as NSString,previewProvider: nil) { _ in
                 
-                let saveAction = UIAction(title: "Save for later", image: UIImage(systemName: "heart")) { [weak self] _ in
+                let saveAction = UIAction(title: "Save for later", image: UIImage(systemName: "heart")) { _ in
                     
                 }
-                let acceptAction = UIAction(title: "Accept Job", image: UIImage(systemName: "checkmark")) { [weak self] _ in
+                let acceptAction = UIAction(title: "Accept Job", image: UIImage(systemName: "checkmark")) { _ in
                     
                 }
                 return UIMenu(title: "Quick Actions", image: nil, children: [saveAction, acceptAction])
@@ -133,7 +265,7 @@ extension JobFeedVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSou
             
             item.contentInsets = NSDirectionalEdgeInsets(top: 5, leading: 7, bottom: 5, trailing: 7)
             
-            var groupHeight = NSCollectionLayoutDimension.fractionalHeight(0.15)
+            var groupHeight = NSCollectionLayoutDimension.absolute(120)
             var groupWidth =  NSCollectionLayoutDimension.fractionalWidth(1)
             
             if self.collectionView.frame.size.width > 500 || self.collectionView.frame.size.height > 1000{
@@ -165,10 +297,45 @@ extension JobFeedVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSou
     }
 }
 
-extension JobFeedVC: UISearchResultsUpdating{
+extension JobFeedVC: JobPickedDelegate {
+    func didPickJob(_ isPicked: Bool) {
+        if isPicked {
+            accessAllJobPostings()
+        }
+    }
+}
+
+extension JobFeedVC: UISearchResultsUpdating, UISearchBarDelegate{
     
     func updateSearchResults(for searchController: UISearchController) {
-            
+        let searchText = searchController.searchBar.text ?? ""
+        if !searchText.isEmpty {
+            filteredPosts = allPosts.filter({ (post) -> Bool in
+                (post.name.lowercased().contains(searchText.lowercased())) ||
+                (String(post.amount).contains(searchText)) ||
+                (post.description.lowercased().contains(searchText.lowercased()))
+            })
+            DispatchQueue.main.async { [weak self] in
+                self?.collectionView.reloadData()
+            }
+        }
+        
     }
+    
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        let searchText = searchBar.text ?? ""
+        if searchText.isEmpty {
+            print("search text is empty")
+//            accessAllJobPostings()
+            filteredPosts = allPosts
+        }
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+//        print("cancel was tapped in searcch bar")
+//        allPosts = []
+//        accessAllJobPostings()
+    }
+    
     
 }

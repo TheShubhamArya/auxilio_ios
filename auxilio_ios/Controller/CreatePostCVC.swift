@@ -7,13 +7,26 @@
 
 import UIKit
 import IQKeyboardManagerSwift
+import Firebase
+import PhotosUI
 
 class CreatePostCVC: UIViewController {
     
     var collectionView : UICollectionView!
     let items = ["Information"]
     var imagePicker: UIImagePickerController!
-    var selectedImage = [UIImage]()
+    var newPost = PostDetails()
+    let db = Firestore.firestore()
+    let auth = Auth.auth()
+    private let storage = Storage.storage().reference()
+    var errorMessage = ""
+    
+    let activityIndicator : UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView(style: .large)
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        activityIndicator.color = .gray
+        return activityIndicator
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,15 +34,25 @@ class CreatePostCVC: UIViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         view.backgroundColor = .systemBackground
         setupCollectionView()
+        view.addSubview(activityIndicator)
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
     }
     
     private func taskTypeMenu() -> UIMenu? {
         let menu = UIMenu(title: "Task type", image: nil, identifier: nil, options: [], children: [
             UIAction(title: "Service", image: nil, handler: { [weak self] (_) in
-                
+                self?.newPost.taskType = PostType.service.rawValue
             }),
             UIAction(title: "Goods", image: nil, handler: { [weak self] (_) in
-                
+                self?.newPost.taskType = PostType.good.rawValue
             })
         ])
         return menu
@@ -39,18 +62,9 @@ class CreatePostCVC: UIViewController {
         let actionSheet = UIAlertController(title: "Select Images", message: "", preferredStyle: .actionSheet)
         let camera = UIAlertAction(title: "Camera", style: .default) { [weak self] _ in
             self?.selectImage(from: .camera)
-//            guard UIImagePickerController.isSourceTypeAvailable(.camera) else {
-//                print("jkhgjkljh")
-//                self?.selectImage(from: .camera)
-//                return
-//            }
         }
         let photoLibrary = UIAlertAction(title: "Photo Library", style: .default) { [weak self] _ in
-            self?.selectImage(from: .photoLibrary)
-//            guard UIImagePickerController.isSourceTypeAvailable(.photoLibrary) else {
-//                self?.selectImage(from: .photoLibrary)
-//                return
-//            }
+            self?.pickPhotos()
         }
         let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         actionSheet.addAction(camera)
@@ -69,20 +83,130 @@ class CreatePostCVC: UIViewController {
     func selectImage(from source: ImageSource){
         imagePicker =  UIImagePickerController()
         imagePicker.delegate = self
-        switch source {
-        case .camera:
-            imagePicker.sourceType = .camera
-        case .photoLibrary:
-            imagePicker.sourceType = .photoLibrary
-        }
+        imagePicker.sourceType = .camera
         imagePicker.modalPresentationStyle = .popover
         present(imagePicker, animated: true, completion: nil)
     }
     
+    @objc func switchValueChanged(_ sender: UISwitch){
+        newPost.allowLocationContactAccess = sender.isOn
+    }
+    
     @objc func removeSelectedImage(_ sender: UIButton) {
-        selectedImage.remove(at: sender.tag - 1)
+        newPost.images.remove(at: sender.tag - 1)
         DispatchQueue.main.async {
             self.collectionView.reloadData()
+        }
+    }
+    
+    @objc func dateChanged(_ sender: UIDatePicker){
+        if sender.tag == 4 {
+            newPost.startDate = sender.date.fullDateString
+        } else if sender.tag == 5 {
+            newPost.endDate = sender.date.fullDateString
+        }
+    }
+    
+    func isValidPost() -> Bool {
+        if newPost.amount <= 0 {
+            errorMessage = "Amount for this job has to be greater than 0."
+            return false
+        }
+        if newPost.images.isEmpty {
+            errorMessage = "Please select at least one image."
+            return false
+        }
+        if newPost.startDate > newPost.endDate {
+            errorMessage = "Start date cannot be greater than the end date."
+            return false
+        }
+//        if newPost.startDate > Date() {
+//            errorMessage = "Start date cannot be before today."
+//            return false
+//        }
+        if !newPost.allowLocationContactAccess {
+            errorMessage = "Please accept terms and conditions."
+            return false
+        }
+        if newPost.name.isEmpty || newPost.rate.isEmpty || newPost.location.isEmpty || newPost.description.isEmpty {
+            errorMessage = "One or more fields is empty."
+            return false
+        }
+        errorMessage = ""
+        return true
+    }
+    
+    func resetAllFields() {
+        newPost = PostDetails()
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+        }
+    }
+    
+    func addPostToFeed() {
+        activityIndicator.startAnimating()
+        AllPosts.createdPosts.append(newPost.post_id)
+        let currentUser = db.collection(User.collectionName).document(auth.currentUser!.uid)
+        currentUser.updateData([
+            User.postsCreated: AllPosts.createdPosts
+        ]) { err in
+            if let err = err {
+                print("Error updating document: \(err)")
+            } else {
+                print("Document successfully updated")
+                self.saveImagesAndGetURL()
+            }
+        }
+    }
+    
+    func saveImagesAndGetURL() {
+        for (i,image) in newPost.images.enumerated() {
+            if let imageData = image.pngData() {
+                let imageID = UUID().uuidString
+                storage.child("Posts/\(newPost.post_id)/\(imageID).png").putData(imageData, metadata: nil) { _, error in
+                    guard error == nil else {
+                        return
+                    }
+                    self.storage.child("Posts/\(self.newPost.post_id)/\(imageID).png").downloadURL { url, error in
+                        guard let url = url, error == nil else {
+                            return
+                        }
+                        let urlString = url.absoluteString
+                        self.newPost.imageURLs.append(urlString)
+                        if i == self.newPost.images.count - 1 {
+                            self.savePostToFirebase()
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    func savePostToFirebase() {
+        activityIndicator.stopAnimating()
+        db.collection(Post.collectionName).document(newPost.post_id).setData([
+            Post.title : newPost.name,
+            Post.description : newPost.description,
+            Post.amount : newPost.amount,
+            Post.rate : newPost.rate,
+            Post.startDate : newPost.startDate,
+            Post.endDate : newPost.endDate,
+            Post.location : newPost.location,
+            Post.taskType : newPost.taskType,
+            Post.privacyAccess : newPost.allowLocationContactAccess,
+            Post.post_id : newPost.post_id,
+            Post.postedBy : auth.currentUser?.uid,
+            Post.postStatus : newPost.postStatus,
+            Post.pickedBy : "none",
+            Post.imageURLs : newPost.imageURLs
+        ]) { error in
+            if let error = error {
+                print(error.localizedDescription)
+                self.alert(title: "Error", message: "Theere was an issue saving data for the account.")
+            } else {
+                self.alert(title: "Success", message: "Your post is added to the job feed")
+                self.resetAllFields()
+            }
         }
     }
     
@@ -119,7 +243,7 @@ extension CreatePostCVC: UICollectionViewDelegateFlowLayout, UICollectionViewDat
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if section == 7 {return selectedImage.count + 1}
+        if section == 7 {return newPost.images.count + 1}
         return 1
     }
     
@@ -130,6 +254,12 @@ extension CreatePostCVC: UICollectionViewDelegateFlowLayout, UICollectionViewDat
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if indexPath.section == 7 && indexPath.item == 0 {
             imageAction()
+        } else if indexPath.section == 11 {
+            if isValidPost() {
+                addPostToFeed()
+            } else {
+                alert(title: "Error", message: errorMessage)
+            }
         }
     }
     
@@ -137,14 +267,21 @@ extension CreatePostCVC: UICollectionViewDelegateFlowLayout, UICollectionViewDat
         let section = indexPath.section
         if section == 0 || section == 2 || section == 3 || section == 8 {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TextFieldCell.identifier, for: indexPath) as? TextFieldCell else {return UICollectionViewCell()}
-            cell.configure(with: indexPath)
+            cell.textField.tag = section
+            cell.configure(with: indexPath, newPost)
             cell.textField.delegate = self
             return cell
         } else if section == 1 {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TextViewCell.identifier, for: indexPath) as? TextViewCell else {return UICollectionViewCell()}
+            cell.descriptionTextView.delegate = self
+            cell.descriptionTextView.text = newPost.description
             return cell
         } else if section == 4 || section == 5{
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DateCell.identifier, for: indexPath) as? DateCell else {return UICollectionViewCell()}
+            cell.datePicker.tag = section
+            newPost.startDate = Date().fullDateString
+            newPost.endDate = Date().fullDateString
+            cell.datePicker.addTarget(self, action: #selector(dateChanged(_:)), for: .touchUpInside)
             cell.configure(with: indexPath)
             return cell
         } else if section == 6 {
@@ -158,7 +295,7 @@ extension CreatePostCVC: UICollectionViewDelegateFlowLayout, UICollectionViewDat
             if indexPath.item == 0 {
                 cell.configure(with: indexPath, image: nil)
             } else {
-                cell.configure(with: indexPath, image: selectedImage[indexPath.item-1])
+                cell.configure(with: indexPath, image: newPost.images[indexPath.item - 1])
             }
             return cell
         } else if section == 9 {
@@ -168,6 +305,8 @@ extension CreatePostCVC: UICollectionViewDelegateFlowLayout, UICollectionViewDat
             return cell
         } else if section == 10 {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SwitchCell.identifier, for: indexPath) as? SwitchCell else { return UICollectionViewCell()}
+            cell.privacySwitch.addTarget(self, action: #selector(switchValueChanged), for: .valueChanged)
+            cell.privacySwitch.isOn = newPost.allowLocationContactAccess
             return cell
         } else if section == 11 {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CreateButtonCell.identifier, for: indexPath) as? CreateButtonCell else {return UICollectionViewCell()}
@@ -175,10 +314,6 @@ extension CreatePostCVC: UICollectionViewDelegateFlowLayout, UICollectionViewDat
         }
         return UICollectionViewCell()
     }
-    
-//    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-//        return UIContextMenuConfiguration()
-//    }
 
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
 
@@ -261,10 +396,26 @@ extension CreatePostCVC: UITextFieldDelegate {
         textField.resignFirstResponder()
         return true
     }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        let section = textField.tag
+        if section == 0 {
+            newPost.name = textField.text ?? ""
+        } else if section == 2 {
+            newPost.amount = Double(textField.text ?? "0") ?? 0
+        } else if section == 3 {
+            newPost.rate = textField.text ?? ""
+        } else if section == 8 {
+            newPost.location = textField.text ?? ""
+        }
+    }
 }
 
+//MARK: - Delegate for text view
 extension CreatePostCVC: UITextViewDelegate{
-    
+    func textViewDidEndEditing(_ textView: UITextView) {
+        newPost.description = textView.text
+    }
 }
 
 //MARK: - Delegate for image picker controller
@@ -277,12 +428,44 @@ extension CreatePostCVC: UIImagePickerControllerDelegate, UINavigationController
             return
         }
         
-        selectedImage.append(image)
+        newPost.images.append(image)
         
         DispatchQueue.main.async {
             
             self.collectionView.reloadData()
             
         }
+    }
+}
+
+//MARK: - Delegate for PHPicker to select multiple images
+extension CreatePostCVC : PHPickerViewControllerDelegate {
+    
+    @objc func pickPhotos(){
+        var config = PHPickerConfiguration()
+        config.selectionLimit = 10
+        config.filter = PHPickerFilter.images
+        config.selection = .ordered
+        let pickerViewController = PHPickerViewController(configuration: config)
+        pickerViewController.delegate = self
+        self.present(pickerViewController, animated: true, completion: nil)
+    }
+    
+    // MARK: PHPickerViewControllerDelegate
+    
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true, completion: nil)
+        for result in results {
+            result.itemProvider.loadObject(ofClass: UIImage.self, completionHandler: { (object, error) in
+                if let image = object as? UIImage {
+                    let fixedImage = image.fixOrientation
+                    self.newPost.images.append(fixedImage)
+                    DispatchQueue.main.async {
+                        self.collectionView.reloadData()
+                    }
+                }
+            })
+        }
+        
     }
 }

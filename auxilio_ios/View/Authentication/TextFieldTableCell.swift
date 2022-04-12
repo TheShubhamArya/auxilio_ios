@@ -13,6 +13,10 @@ class TextFieldTableCell: UITableViewCell {
     
     let textField : UITextField = {
         let tf = UITextField()
+        tf.borderStyle = .roundedRect
+        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: tf.frame.height))
+        tf.leftView = paddingView
+        tf.leftViewMode = UITextField.ViewMode.always
         return tf
     }()
     
@@ -21,14 +25,15 @@ class TextFieldTableCell: UITableViewCell {
         contentView.addSubViews(textField)
         textField.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            textField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
-            textField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
-            textField.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
-            textField.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
+            textField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5),
+            textField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5),
+            textField.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5),
+            textField.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5),
         ])
     }
     
     public func configure(with indexPath: IndexPath, type: AuthType) {
+        textField.isSecureTextEntry = false
         if type == .signin {
             if indexPath.section == 0 && indexPath.row == 0 {
                 textField.attributedPlaceholder = attributedPlaceholder(with: "Email", for: "envelope")

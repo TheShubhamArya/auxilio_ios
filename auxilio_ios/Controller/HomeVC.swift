@@ -6,18 +6,28 @@
 //
 
 import UIKit
-import SwiftUI
+import Firebase
 
 class HomeVC: UIViewController {
     
     var collectionView : UICollectionView!
     let headings = ["Get Started","Benefits","Customers","Service Providers","About us"]
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         setupNavbar()
         setupCollectionView()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        let authid = Auth.auth().currentUser?.uid
+        if authid != nil{
+            let vc = MainTabBarController()
+            vc.modalPresentationStyle = .fullScreen
+            present(vc, animated: true, completion: nil)
+        }
     }
     
     func setupNavbar() {

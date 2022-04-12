@@ -35,11 +35,7 @@ class ImageCell: UICollectionViewCell {
     }
     
     public func configure(with indexPath: IndexPath, image: UIImage?) {
-        if indexPath.item == 0 {
-            removeImageButton.alpha = 0
-        } else {
-            removeImageButton.alpha = 1
-        }
+        removeImageButton.alpha = indexPath.item == 0 ? 0 : 1
         if indexPath.item >= 0 {
             if let image = image {
                 jobImage.image = image
@@ -49,15 +45,12 @@ class ImageCell: UICollectionViewCell {
                 jobImage.image = UIImage(systemName: "plus", withConfiguration: config)
             }
         }
-        
     }
     
     private func layoutElements() {
         jobImage.translatesAutoresizingMaskIntoConstraints = false
         removeImageButton.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-//            jobImage.heightAnchor.constraint(equalTo: contentView.heightAnchor, multiplier: 1),
-//            jobImage.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 1),
             jobImage.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
             jobImage.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             jobImage.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),

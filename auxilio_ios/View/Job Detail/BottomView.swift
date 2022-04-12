@@ -15,8 +15,15 @@ class BottomView: UIView {
         return view
     }()
     
-    let saveButton = RoundButton()
-    let acceptButton = RoundButton()
+    var saveButton : UIButton = {
+        let btn = UIButton()
+        return btn
+    }()
+    
+    var acceptButton : UIButton = {
+        let btn = UIButton()
+        return btn
+    }()
     
     private let middleLabel : UILabel = {
         let label = UILabel()
@@ -53,12 +60,20 @@ class BottomView: UIView {
             middleLabel.trailingAnchor.constraint(equalTo: acceptButton.leadingAnchor, constant: -10),
             middleLabel.centerYAnchor.constraint(equalTo: self.centerYAnchor, constant: -10)
         ])
-        acceptButton.configure(imageName: "checkmark.circle.fill", color: .systemGreen)
-        saveButton.configure(imageName: "heart.circle.fill", color: .systemPink)
+        
+        configure(acceptButton, imageName: "checkmark.circle.fill", color: .systemGreen)
+        configure(saveButton, imageName: "heart.circle.fill", color: .systemPink)
     }
     
-    public func configure() {
-        middleLabel.attributedText = amountWithRatesAttributes(with: "$", for: "14", rate: " per hour")
+    public func configure(_ button: UIButton, imageName: String, color: UIColor) {
+        let largeConfig = UIImage.SymbolConfiguration(pointSize: 40, weight: .semibold, scale: .medium)
+        let largeBoldHeart = UIImage(systemName: imageName, withConfiguration: largeConfig)
+        button.setImage(largeBoldHeart, for: .normal)
+        button.tintColor = color
+    }
+    
+    public func configure(with post: PostDetails) {
+        middleLabel.attributedText = amountWithRatesAttributes(with: "$", for: post.amount.removeTrailingZeros, rate: " \(post.rate)")
     }
     
     required init?(coder: NSCoder) {

@@ -29,8 +29,17 @@ class JobImageCell: UICollectionViewCell {
         ])
     }
     
-    public func configure(for image: UIImage) {
-        jobImage.image = image
+    public func configure(for urlString: String) {
+        print("url for image is \(urlString)")
+//        if let url = URL(string: urlString) {
+//            DispatchQueue.global().async {
+//                if let data = try? Data(contentsOf: url) {
+//                    DispatchQueue.main.async {
+//                        self.jobImage.image = UIImage(data: data)
+//                    }
+//                }
+//            }
+//        }
     }
     
     required init?(coder: NSCoder) {

@@ -29,23 +29,29 @@ class TextFieldCell: UICollectionViewCell {
         layoutElements()
     }
     
-    public func configure(with indexPath: IndexPath) {
+    public func configure(with indexPath: IndexPath, _ content: PostDetails) {
         textField.textColor = .secondaryLabel
         textField.keyboardType = .default
         if indexPath.row == 0 && indexPath.section == 0 {
             label.text = "Name"
             textField.placeholder = "Enter job title here"
+            textField.text = content.name
         } else if indexPath.section == 2 {
             label.text = "Amount"
             textField.placeholder = "$0.00"
             textField.keyboardType = .decimalPad
+            if content.amount == 0 {
+                textField.text = ""
+            }
         } else if indexPath.section == 3 {
             label.text = "Rate for amount"
             textField.placeholder = "Eg. per hour"
+            textField.text = content.rate
         } else if indexPath.section == 8 {
             label.text = "Location"
             textField.placeholder = "Enter your address"
             textField.textColor = .systemBlue
+            textField.text = content.location
         }
     }
     

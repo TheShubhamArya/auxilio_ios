@@ -7,6 +7,16 @@
 
 import UIKit
 
+//let jobDetails = [
+//    JobDetails(name: "Cleaning", image: UIImage(named: "cleaning")!, date: "Jan 11, 2022", descripton: "I need some one to do some deep cleaning of my apartment. I have all the equipements.", amount: 15, duration: "per hour"),
+//    JobDetails(name: "Cooking", image: UIImage(named: "cooking")!, date: "Jan 17, 2022", descripton: "Cooking ingredieents and items will be provided. You can eat too.", amount: 12, duration: "per hour"),
+//    JobDetails(name: "Laundry", image: UIImage(named: "laundry")!, date: "Jan 14, 2022", descripton: "I have no time to do laundry so can you do my laundry. I will give you something for free", amount: 10, duration: "per hour"),
+//    JobDetails(name: "Moving out", image: UIImage(named: "moving")!, date: "Jan 21, 2022", descripton: "I am moving out and need some strong person to carry the furntiture 2 floors down into the car. Need it urgent.", amount: 9, duration: "per hour"),
+//    JobDetails(name: "Pick up groceries", image: UIImage(named: "groceries")!, date: "Jan 5, 2022", descripton: "Need like 20 items of groceries from any store like eggs, milk, bread, potatoes, tomatoes, etc.", amount: 20, duration: "in total"),
+//    JobDetails(name: "Raspberry pi", image: UIImage(named: "raspberry_pi")!, date: "Jan 11, 2022", descripton: "Unused raspberry pi with everything in it. Prices aree negotiable plus I will give you free cardboard box.", amount: 50, duration: "One time")
+//
+//]
+
 class JobPostingCell: UICollectionViewCell {
     static let identifier = "JobPostingCellIdentifier"
     
@@ -15,6 +25,8 @@ class JobPostingCell: UICollectionViewCell {
     public let jobImageView : UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
+        imageView.image = UIImage(named: "load-icon")
+        imageView.tintColor = .systemYellow
         return imageView
     }()
     
@@ -24,7 +36,6 @@ class JobPostingCell: UICollectionViewCell {
         label.font = UIFont.systemFont(ofSize: 18, weight: .bold)
         label.minimumScaleFactor = 0.85
         label.adjustsFontSizeToFitWidth = true
-//        label.backgroundColor = .systemGreen
         return label
     }()
     
@@ -35,7 +46,6 @@ class JobPostingCell: UICollectionViewCell {
         label.minimumScaleFactor = 0.85
         label.adjustsFontSizeToFitWidth = true
         label.textColor = .systemBlue
-//        label.backgroundColor = .systemRed
         return label
     }()
     
@@ -43,7 +53,6 @@ class JobPostingCell: UICollectionViewCell {
         let label = UILabel()
         label.numberOfLines = 2
         label.font = UIFont.systemFont(ofSize: 12, weight: .thin)
-//        label.backgroundColor = .blue
         return label
     }()
     
@@ -53,7 +62,6 @@ class JobPostingCell: UICollectionViewCell {
         label.adjustsFontSizeToFitWidth = true
         label.textAlignment = .right
         label.font = UIFont.systemFont(ofSize: 25, weight: .heavy)
-//        label.backgroundColor = .systemPink
         return label
     }()
     
@@ -61,25 +69,46 @@ class JobPostingCell: UICollectionViewCell {
         let label = UILabel()
         label.textAlignment = .right
         label.font = UIFont.systemFont(ofSize: 15, weight: .medium)
-//        label.backgroundColor = .orange
         return label
+    }()
+    
+    private let saveImageView : UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.image = UIImage(systemName: "heart.fill")
+        imageView.tintColor = .systemRed
+        return imageView
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.addSubViews(jobImageView, nameLabel, dateLabel, descriptionLabel, amountLabel, durationLabel)
+        contentView.addSubViews(jobImageView, nameLabel, dateLabel, descriptionLabel, amountLabel, durationLabel, saveImageView)
         layoutViews()
     }
     
-    func configure(at indexPath: IndexPath){
-        let job = jobDetails[indexPath.row]
-        jobImageView.image = job.image
-        nameLabel.text = job.name
-        dateLabel.text = "Do by \(job.date)"
-        descriptionLabel.text = "I need some one to do some deep cleaning of my apartment. I have all the equipements."
+    func configure(for post: PostDetails, isSaved: Bool = false){
+        if !post.imageURLs.isEmpty {
+//            if let url = URL(string: post.imageURLs[0]) {
+//                DispatchQueue.global().async {
+//                    if let data = try? Data(contentsOf: url) {
+//                        DispatchQueue.main.async {
+//                            self.jobImageView.image = UIImage(data: data)
+//                        }
+//                    }
+//                }
+//            }
+            jobImageView.image = UIImage(systemName: "exclamationmark.triangle")
+        } else {
+            jobImageView.image = UIImage(systemName: "exclamationmark.triangle")
+        }
         
-        amountLabel.attributedText = attributedAmount(with: "$", for: job.amount.removeTrailingZeros)
-        durationLabel.text = jobDetails[indexPath.row].duration
+        nameLabel.text = post.name
+        dateLabel.text = "By \(post.endDate)"
+        descriptionLabel.text = post.description
+        
+        amountLabel.attributedText = attributedAmount(with: "$", for: post.amount.removeTrailingZeros)
+        durationLabel.text = post.rate
+        saveImageView.alpha = isSaved ? 1 : 0
         let bottomLine = CALayer()
         
         bottomLine.frame = CGRect(x: 0.0, y: contentView.frame.size.height, width: contentView.frame.size.width, height: 0.5)
@@ -96,6 +125,7 @@ class JobPostingCell: UICollectionViewCell {
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
         amountLabel.translatesAutoresizingMaskIntoConstraints = false
         durationLabel.translatesAutoresizingMaskIntoConstraints = false
+        saveImageView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             jobImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             jobImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
@@ -113,7 +143,7 @@ class JobPostingCell: UICollectionViewCell {
             
             descriptionLabel.topAnchor.constraint(equalTo: dateLabel.bottomAnchor, constant: 2),
             descriptionLabel.leadingAnchor.constraint(equalTo: jobImageView.trailingAnchor, constant: 10),
-            descriptionLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            descriptionLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
             descriptionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             
             amountLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
@@ -123,7 +153,12 @@ class JobPostingCell: UICollectionViewCell {
             durationLabel.leadingAnchor.constraint(equalTo: dateLabel.trailingAnchor, constant: 3),
             durationLabel.bottomAnchor.constraint(equalTo: descriptionLabel.topAnchor),
             durationLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            durationLabel.topAnchor.constraint(equalTo: amountLabel.bottomAnchor, constant: 1)
+            durationLabel.topAnchor.constraint(equalTo: amountLabel.bottomAnchor, constant: 1),
+            
+            saveImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
+            saveImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            saveImageView.heightAnchor.constraint(equalToConstant: 20),
+            saveImageView.widthAnchor.constraint(equalToConstant: 20)
         ])
     }
     
@@ -131,14 +166,6 @@ class JobPostingCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    let jobDetails = [
-        JobDetails(name: "Cleaning", image: UIImage(named: "cleaning")!, date: "Jan 11, 2022", descripton: "", amount: 15, duration: "per hour"),
-        JobDetails(name: "Cooking", image: UIImage(named: "cooking")!, date: "Jan 17, 2022", descripton: "", amount: 12, duration: "per hour"),
-        JobDetails(name: "Laundry", image: UIImage(named: "laundry")!, date: "Jan 14, 2022", descripton: "", amount: 10, duration: "per hour"),
-        JobDetails(name: "Moving out", image: UIImage(named: "moving")!, date: "Jan 21, 2022", descripton: "", amount: 9, duration: "per hour"),
-        JobDetails(name: "Pick up groceries", image: UIImage(named: "groceries")!, date: "Jan 5, 2022", descripton: "", amount: 20, duration: "in total"),
-        JobDetails(name: "Cleaning", image: UIImage(named: "cleaning")!, date: "Jan 11, 2022", descripton: "", amount: 15, duration: "per hour")
-
-    ]
+    
     
 }
