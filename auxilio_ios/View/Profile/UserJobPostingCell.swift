@@ -23,6 +23,7 @@ class UserJobPostingCell: JobPostingCell {
         label.adjustsFontSizeToFitWidth = true
         label.layer.masksToBounds = true
         label.layer.cornerRadius = 7.5
+        label.font = UIFont.systemFont(ofSize: 11, weight: .medium)
         return label
     }()
     
@@ -32,7 +33,7 @@ class UserJobPostingCell: JobPostingCell {
         layoutElements()
     }
     
-    func configureStatusLabel(with post: PostDetails){
+    func configureStatusLabel(with post: PostDetails,isSaved: Bool = false){
         configure(for: post)
         statusLabel.text = post.postStatus
         var color = UIColor.systemYellow
@@ -48,15 +49,15 @@ class UserJobPostingCell: JobPostingCell {
             color = UIColor.systemRed
         }
         statusLabel.backgroundColor = color
-        
+        statusLabel.alpha = isSaved ? 0 : 1
     }
     
     func layoutElements() {
         statusLabel.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             statusLabel.bottomAnchor.constraint(equalTo: jobImageView.bottomAnchor, constant: 5),
-            statusLabel.leadingAnchor.constraint(equalTo: jobImageView.leadingAnchor, constant: -5),
-            statusLabel.trailingAnchor.constraint(equalTo: jobImageView.trailingAnchor, constant: 5),
+            statusLabel.leadingAnchor.constraint(equalTo: jobImageView.leadingAnchor, constant: 3),
+            statusLabel.trailingAnchor.constraint(equalTo: jobImageView.trailingAnchor, constant: -3),
             statusLabel.heightAnchor.constraint(equalToConstant: 15)
         ])
     }

@@ -6,8 +6,14 @@
 //
 
 import UIKit
+import Firebase
 
 class SigninTVC: UITableViewController {
+    
+    var email : String = ""
+    var password : String = ""
+    var errorMessage : String = ""
+    let activityIndicator = UIActivityIndicatorView(style: .medium)
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -16,11 +22,60 @@ class SigninTVC: UITableViewController {
         tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.register(TextFieldTableCell.self, forCellReuseIdentifier: TextFieldTableCell.identifier)
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "reuseIdentifier")
+        tableView.register(CenterLabelCell.self, forCellReuseIdentifier: CenterLabelCell.identifier)
+        tableView.backgroundColor = .systemBackground
+        tableView.separatorStyle = .none
     }
     
     @objc func createAccount() {
         let vc = RegisterTVC()
         navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    func isValidInput() -> Bool{
+        email = email.trimming(spaces: .all)
+        if email.isEmpty || password.isEmpty {
+            errorMessage = "One or more fields is empty."
+            return false
+        }
+        if !email.isValidEmail() {
+            errorMessage = "Not a valid email address."
+            return false
+        }
+        if password.count < 6 || password.count > 18 {
+            errorMessage = "Password must be between 6-18 characters."
+            return false
+        }
+
+        errorMessage = ""
+        return true
+    }
+    
+    func setLoading(_ loading: Bool) {
+        if loading {
+            activityIndicator.startAnimating()
+            errorMessage = ""
+        } else {
+            activityIndicator.stopAnimating()
+        }
+    }
+    
+    func signIn() {
+        
+        Auth.auth().signIn(withEmail: email, password: password) { [weak self] (result, error) in
+            if let error = error {
+                print(error.localizedDescription)
+                self?.errorMessage = "Cannot sign in with those details."
+                DispatchQueue.main.async {
+                    self?.tableView.reloadData()
+                }
+            } else {
+                let vc = MainTabBarController()
+                vc.modalPresentationStyle = .fullScreen
+                self?.present(vc, animated: true, completion: nil)
+            }
+        }
+        
     }
 
     // MARK: - Table view data source
@@ -30,7 +85,7 @@ class SigninTVC: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return section == 0 ? 2 : 1
+        return section == 0 ? 2 : 2
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -38,40 +93,58 @@ class SigninTVC: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 20
+        return section == 0 ? 20 : 0
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if indexPath.section == 0 {
+        if indexPath.section == 0 || (indexPath.section == 1 && indexPath.row == 1) {
             return 50
+        } else {
+            return 30
         }
-        return UITableView.automaticDimension
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let row = indexPath.row
         if indexPath.section == 0 {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: TextFieldTableCell.identifier, for: indexPath) as? TextFieldTableCell else {return UITableViewCell()}
+            cell.backgroundColor = .systemBackground
             cell.configure(with: indexPath, type: .signin)
             cell.textField.delegate = self
+            cell.textField.tag = row
+            if row == 0 {
+                cell.textField.text = email
+            } else if row == 1{
+                cell.textField.text = password
+            }
             cell.selectionStyle = .none
+            return cell
+        } else if indexPath.section == 1 && indexPath.row == 1{
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: CenterLabelCell.identifier, for: indexPath) as? CenterLabelCell else {return UITableViewCell()}
+            cell.configure(with: "Sign in")
             return cell
         } else {
             let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
-            cell.textLabel?.text = "Sign in"
-            cell.textLabel?.font = .boldSystemFont(ofSize: 18)
+            cell.selectionStyle = .none
+            cell.backgroundColor = .systemBackground
+            cell.textLabel?.text = errorMessage
             cell.textLabel?.textAlignment = .center
-            cell.textLabel?.textColor = .white
-            cell.backgroundColor = .systemGreen
+            cell.textLabel?.numberOfLines = 0
+            cell.textLabel?.font = UIFont.systemFont(ofSize: 14)
+            cell.textLabel?.textColor = .systemRed
             return cell
         }
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if indexPath.section == 1 {
-            let vc = MainTabBarController()
-            vc.modalPresentationStyle = .fullScreen
-            present(vc, animated: true, completion: nil)
+        if indexPath.section == 1 && indexPath.row == 1 {
+            if isValidInput() {
+                signIn()
+            } else {
+                tableView.reloadData()
+            }
         }
+        tableView.deselectRow(at: indexPath, animated: true)
     }
     
 }
@@ -82,6 +155,15 @@ extension SigninTVC: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
+    }
+    
+    func textFieldDidChangeSelection(_ textField: UITextField) {
+        let text = textField.text ?? ""
+        if textField.tag == 0 {
+            email = text
+        } else if textField.tag == 1 {
+            password = text
+        }
     }
     
 }

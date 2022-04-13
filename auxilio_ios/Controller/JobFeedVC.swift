@@ -17,6 +17,13 @@ class JobFeedVC: UIViewController {
     var allPosts = [PostDetails]()
     var filteredPosts = [PostDetails]()
     
+    let activityIndicator : UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView(style: .large)
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        activityIndicator.color = .gray
+        return activityIndicator
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -24,7 +31,14 @@ class JobFeedVC: UIViewController {
         setupCollectionView()
         refreshControl.attributedTitle = NSAttributedString(string: "Refreshing...")
         self.refreshControl.addTarget(self, action: #selector(refresh), for: .valueChanged)
-        collectionView .insertSubview(refreshControl, at: 0)
+        collectionView.insertSubview(refreshControl, at: 0)
+        
+        view.addSubview(activityIndicator)
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
         
         let docRef = db.collection(User.collectionName).document(auth.currentUser!.uid)
         docRef.getDocument { (document, error) in
@@ -48,6 +62,7 @@ class JobFeedVC: UIViewController {
     }
     
     func accessAllJobPostings() {
+        activityIndicator.startAnimating()
         allPosts = []
         db.collection(Post.collectionName).getDocuments() { (querySnapshot, err) in
             if let err = err {
@@ -69,7 +84,8 @@ class JobFeedVC: UIViewController {
                            let post_id = data[Post.post_id] as? String,
                            let postedBy = data[Post.postedBy] as? String,
                            let imageUrls = data[Post.imageURLs] as? [String],
-                           let pickedBy = data[Post.pickedBy] as? String{
+                           let pickedBy = data[Post.pickedBy] as? String,
+                           let postStatus = data[Post.postStatus] as? String{
                             post.name = title
                             post.description = description
                             post.rate = rate
@@ -83,12 +99,36 @@ class JobFeedVC: UIViewController {
                             post.postedBy = postedBy
                             post.imageURLs = imageUrls
                             post.pickedBy = pickedBy
-                            self.allPosts.append(post)
-                            self.filteredPosts = self.allPosts
+                            post.postStatus = postStatus
+                            if !post.imageURLs.isEmpty {
+                                if let url = URL(string: post.imageURLs.first!) {
+                                    DispatchQueue.global().async {
+                                        if let data = try? Data(contentsOf: url) {
+                                            post.images.append(UIImage(data: data)!)
+                                            self.allPosts.append(post)
+                                            self.filteredPosts = self.allPosts
+                                        } else {
+                                            self.allPosts.append(post)
+                                            self.filteredPosts = self.allPosts
+                                        }
+                                        DispatchQueue.main.async {
+                                            self.collectionView.reloadData()
+                                        }
+                                        
+                                    }
+                                } else {
+                                    self.allPosts.append(post)
+                                    self.filteredPosts = self.allPosts
+                                }
+                            } else {
+                                self.allPosts.append(post)
+                                self.filteredPosts = self.allPosts
+                            }
                         }
                     }
                 }
                 DispatchQueue.main.async {
+                    self.activityIndicator.stopAnimating()
                     self.refreshControl.endRefreshing()
                     self.collectionView.reloadData()
                 }
@@ -220,8 +260,9 @@ extension JobFeedVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSou
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let vc = JobDetailVC()
-        vc.post = filteredPosts[indexPath.item]//allPosts[indexPath.item]
+        vc.post = filteredPosts[indexPath.item]
         vc.jobPickedDelegate = self
+        vc.indexPath = indexPath
         vc.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(vc, animated: true)
     }
@@ -298,9 +339,17 @@ extension JobFeedVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSou
 }
 
 extension JobFeedVC: JobPickedDelegate {
-    func didPickJob(_ isPicked: Bool) {
+    func didChangePostStatus(for post: PostDetails, updateAt indexPath: IndexPath) {
+        
+    }
+    
+    func didPickJob(_ isPicked: Bool,removeFrom indexPath: IndexPath) {
         if isPicked {
-            accessAllJobPostings()
+            allPosts.remove(at: indexPath.item)
+            filteredPosts = allPosts
+            DispatchQueue.main.async {
+                self.collectionView.reloadData()
+            }
         }
     }
 }
@@ -325,16 +374,12 @@ extension JobFeedVC: UISearchResultsUpdating, UISearchBarDelegate{
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
         let searchText = searchBar.text ?? ""
         if searchText.isEmpty {
-            print("search text is empty")
-//            accessAllJobPostings()
             filteredPosts = allPosts
         }
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-//        print("cancel was tapped in searcch bar")
-//        allPosts = []
-//        accessAllJobPostings()
+        
     }
     
     

@@ -63,13 +63,35 @@ class EditProfileVC: UIViewController {
     
     @objc func editButtonTapped() {
         isEditable = !isEditable
-        var EditButtonText = "Edit"
+        var editButtonText = "Edit"
         if isEditable {
-            EditButtonText = "Done"
+            editButtonText = "Done"
+        } else {
+            updateUserInfoInFirebase()
         }
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: EditButtonText, style: .plain, target: self, action: #selector(editButtonTapped))
+        let editButton = UIBarButtonItem(title: editButtonText, style: .plain, target: self, action: #selector(editButtonTapped))
+        let profilePicButton = UIBarButtonItem(image: UIImage(systemName: "camera"), style: .plain, target: self, action: #selector(addProfileImage))
+        
+        navigationItem.rightBarButtonItems = [profilePicButton, editButton]
         DispatchQueue.main.async {
             self.tableView.reloadData()
+        }
+    }
+    
+    func updateUserInfoInFirebase() {
+        let userInfo = self.db.collection(User.collectionName).document(self.auth.currentUser!.uid)
+        userInfo.updateData([
+            User.name : user.name,
+            User.address : user.address,
+            User.mobile : user.mobile
+        ]) { [weak self] err in
+            if let err = err {
+                print("Error updating document: \(err)")
+            } else {
+                self?.editProfileDelegate.didEditInfo(of: self?.user ?? UserDetails())
+                self?.alert(title: "Success!", message: "Your edit has been saved")
+                print("Document successfully updated")
+            }
         }
     }
     
@@ -93,12 +115,22 @@ extension EditProfileVC : UIImagePickerControllerDelegate, UINavigationControlle
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         picker.dismiss(animated: true, completion: nil)
-        guard let image = info[.originalImage] as? UIImage else {
+        guard let image = info[.editedImage] as? UIImage else {
             alert(title: "Error", message: "Image not found. Please try again.")
             return
         }
         
-        let fixedImage = image.fixOrientation
+        guard let medImage = image.jpeg(.medium) else {
+            alert(title: "Error", message: "Please try again later.")
+            return
+        }
+        
+        guard let uiimage = UIImage(data: medImage) else {
+            alert(title: "Error", message: "Please try again later.")
+            return
+        }
+        
+        let fixedImage = uiimage.fixOrientation
         
         guard let imageData = fixedImage.pngData() else {
             alert(title: "Error", message: "Please try again later.")
@@ -136,7 +168,7 @@ extension EditProfileVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: LabelTextViewCell.identifier, for: indexPath) as? LabelTextViewCell else {return UITableViewCell()}
-        cell.configure(for: indexPath, isEditable: isEditable)
+        cell.configure(for: indexPath, user, isEditable: isEditable)
         cell.cellDelegate = self
         return cell
     }

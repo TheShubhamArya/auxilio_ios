@@ -15,6 +15,7 @@ class ProfileCardCell: UICollectionViewCell {
     private let profilePicture : UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
+        imageView.layer.masksToBounds = true
         imageView.layer.cornerRadius = 50
         return imageView
     }()
@@ -59,10 +60,8 @@ class ProfileCardCell: UICollectionViewCell {
     
     let editButton : UIButton = {
         let button = UIButton()
-        button.setTitle("Edit", for: .normal)
-        button.backgroundColor = .label
-        button.setTitleColor(.systemBackground, for: .normal)
-        button.layer.cornerRadius = 5
+        button.setImage(UIImage(systemName: "pencil.circle.fill"), for: .normal)
+        button.tintColor = .label
         return button
     }()
     
@@ -82,37 +81,36 @@ class ProfileCardCell: UICollectionViewCell {
         self.layer.borderWidth = 1.0
         self.layer.borderColor = UIColor.quaternaryLabel.cgColor
         
-        contentView.addSubViews(verticalStack, profilePicture)
+        contentView.addSubViews(verticalStack, profilePicture, editButton)
         layoutElements()
         verticalStack.translatesAutoresizingMaskIntoConstraints = false
+        editButton.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             verticalStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
             verticalStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
-            verticalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
+            verticalStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -35),
             verticalStack.leadingAnchor.constraint(equalTo: profilePicture.trailingAnchor, constant: 10),
+            
+            editButton.heightAnchor.constraint(equalToConstant: 20),
+            editButton.widthAnchor.constraint(equalToConstant: 20),
+            editButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
+            editButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10)
         ])
         verticalStack.addArrangedSubview(usernameLabel)
         verticalStack.addArrangedSubview(emailLabel)
         verticalStack.addArrangedSubview(mobileLabel)
         verticalStack.addArrangedSubview(addressLabel)
-        verticalStack.addArrangedSubview(editButton)
     }
     
     func configure(with user: UserDetails) {
         if profilePicture.image == nil {
             profilePicture.image = UIImage(systemName: "person")?.withTintColor(.systemGray)
         }
-//        if let url = URL(string: user.imageURL) {
-//            let task = URLSession.shared.dataTask(with: url, completionHandler: { data, _, error in
-//                if let data = data, error == nil {
-//                    DispatchQueue.main.async(execute: { () -> Void in
-//                        let image = UIImage(data: data)
-//                        self.profilePicture.image = image
-//                    })
-//                }
-//            })
-//            task.resume()
-//        }
+        
+        if let image = user.image {
+            profilePicture.image = image
+        }
+        
         usernameLabel.text = user.name
         emailLabel.text = user.email
         mobileLabel.text = user.mobile
@@ -121,14 +119,11 @@ class ProfileCardCell: UICollectionViewCell {
     
     private func layoutElements() {
         profilePicture.translatesAutoresizingMaskIntoConstraints = false
-        editButton.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             profilePicture.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             profilePicture.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
             profilePicture.heightAnchor.constraint(equalToConstant: 100),
             profilePicture.widthAnchor.constraint(equalToConstant: 100),
-            editButton.widthAnchor.constraint(equalToConstant: 100)
-            
         ])
     }
     

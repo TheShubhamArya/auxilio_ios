@@ -34,6 +34,7 @@ class UserDetails {
     var postsPicked = [String]()            // lists of post uids picked by user
     var postsSaved = [String]()
     var imageURL = ""
+    var image : UIImage?
 
 //    @Persisted var profileImage: UIImage?              // stores users profile pictire
 //    @Persisted private var personalInfo: PersonalInfo  // personal info structure that should not be visible to others

@@ -13,26 +13,40 @@ class ProfileVC: UIViewController{
     var collectionView : UICollectionView!
     var segmentControl : UISegmentedControl!
     var segment = 0
-    let items = ["Posted","Picked", "Saved"]
+    let items = ["Posted", "Picked", "Saved"]
     var user = UserDetails()
     var posts = [[PostDetails]](repeating: [PostDetails](), count: 3)
+    var filteredPosts = [[PostDetails]](repeating: [PostDetails](), count: 3)
     let auth = Auth.auth()
     let db = Firestore.firestore()
+    let activityIndicator : UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView(style: .large)
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        activityIndicator.color = .gray
+        return activityIndicator
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupNavbar()
         setupCollectionView()
+        view.addSubview(activityIndicator)
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
         accessCurrentUserInfo()
-        accessAllJobsRelatedToUser()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
-        user.postsSaved = AllPosts.savedPosts
-        user.postsPicked = AllPosts.pickedPosts
-        user.postsCreated = AllPosts.createdPosts
-        accessAllJobsRelatedToUser()
+        
+        if user.postsSaved != AllPosts.savedPosts || user.postsPicked != AllPosts.pickedPosts || user.postsCreated != AllPosts.createdPosts {
+            activityIndicator.startAnimating()
+            accessAllJobsRelatedToUser()
+        }
+        
     }
     
     func accessCurrentUserInfo() {
@@ -58,6 +72,18 @@ class ProfileVC: UIViewController{
                     self.user.postsPicked = postsPicked
                     self.user.postsSaved = postsSaved
                     self.user.imageURL = imageURL
+                    if let url = URL(string: imageURL) {
+                        let task = URLSession.shared.dataTask(with: url, completionHandler: { data, _, error in
+                            if let data = data, error == nil {
+                                DispatchQueue.main.async(execute: { () -> Void in
+                                    if let image = UIImage(data: data) {
+                                        self.user.image = image
+                                    }
+                                })
+                            }
+                        })
+                        task.resume()
+                    }
                     DispatchQueue.main.async {
                         self.accessAllJobsRelatedToUser()
                         self.collectionView.reloadData()
@@ -80,25 +106,33 @@ class ProfileVC: UIViewController{
                 for document in querySnapshot!.documents {
                     let data = document.data()
                     if AllPosts.createdPosts.contains((data[Post.post_id] as? String)!) {
-                        let post = self.checkPostData(with: data)
-                        self.posts[UserPost.created.rawValue].append(post)
+                        if let post = self.checkPostData(with: data) {
+                            self.posts[UserPost.created.rawValue].append(post)
+                        }
+                        
                     } else if AllPosts.pickedPosts.contains((data[Post.post_id] as? String)!) {
-                        let post = self.checkPostData(with: data)
-                        self.posts[UserPost.picked.rawValue].append(post)
+                        if let post = self.checkPostData(with: data) {
+                            self.posts[UserPost.picked.rawValue].append(post)
+                        }
+                        
                     }
                     if AllPosts.savedPosts.contains((data[Post.post_id] as? String)!) {
-                        let post = self.checkPostData(with: data)
-                        self.posts[UserPost.saved.rawValue].append(post)
+                        if let post = self.checkPostData(with: data) {
+                            self.posts[UserPost.saved.rawValue].append(post)
+                        }
+                        
                     }
                 }
+                self.filteredPosts = self.posts
                 DispatchQueue.main.async {
+                    self.activityIndicator.stopAnimating()
                     self.collectionView.reloadData()
                 }
             }
         }
     }
     
-    func checkPostData(with data: [String : Any]) -> PostDetails {
+    func checkPostData(with data: [String : Any]) -> PostDetails? {
         var post = PostDetails()
         if let title = data[Post.title] as? String,
            let description = data[Post.description] as? String,
@@ -112,7 +146,8 @@ class ProfileVC: UIViewController{
            let post_id = data[Post.post_id] as? String,
            let postedBy = data[Post.postedBy] as? String,
            let imageUrls = data[Post.imageURLs] as? [String],
-           let pickedBy = data[Post.pickedBy] as? String{
+           let pickedBy = data[Post.pickedBy] as? String,
+           let postStatus = data[Post.postStatus] as? String{
             post.name = title
             post.description = description
             post.rate = rate
@@ -126,8 +161,21 @@ class ProfileVC: UIViewController{
             post.postedBy = postedBy
             post.imageURLs = imageUrls
             post.pickedBy = pickedBy
+            post.postStatus = postStatus
+            if !post.imageURLs.isEmpty {
+                if let url = URL(string: post.imageURLs.first!) {
+                    if let data = try? Data(contentsOf: url) {
+                        post.images.append(UIImage(data: data)!)
+                        return post
+                    }
+                } else {
+                    return post
+                }
+            } else {
+                return post
+            }
         }
-        return post
+        return nil
     }
     
     func setupNavbar(){
@@ -200,7 +248,6 @@ class ProfileVC: UIViewController{
 extension ProfileVC : EditProfileDelegate {
     func didEditInfo(of user: UserDetails) {
         self.user = user
-        print("did edit info")
         DispatchQueue.main.async {
             self.collectionView.reloadData()
         }
@@ -234,7 +281,7 @@ extension ProfileVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSou
         if section == 0 {
             return 1
         } else {
-            return posts[segment].count
+            return filteredPosts[segment].count
         }
     }
     
@@ -245,8 +292,9 @@ extension ProfileVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSou
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if indexPath.section == 1 {
             let vc = JobDetailVC()
-            vc.post = posts[segment][indexPath.item]
+            vc.post = filteredPosts[segment][indexPath.item]
             vc.jobPickedDelegate = self
+            vc.indexPath = indexPath
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -261,7 +309,7 @@ extension ProfileVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSou
             return cell
         } else {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: UserJobPostingCell.identifier, for: indexPath) as? UserJobPostingCell else {return UICollectionViewCell()}
-            cell.configureStatusLabel(with: posts[segment][indexPath.item])
+            cell.configureStatusLabel(with: filteredPosts[segment][indexPath.item], isSaved: segment == 2 ? true : false)
             return cell
         }
     }
@@ -294,7 +342,7 @@ extension ProfileVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSou
             
             item.contentInsets = NSDirectionalEdgeInsets(top: 5, leading: 7, bottom: 5, trailing: 7)
             
-            var groupHeight = sectionIndex == 0 ? NSCollectionLayoutDimension.fractionalHeight(0.25) : NSCollectionLayoutDimension.absolute(120)
+            var groupHeight = sectionIndex == 0 ? NSCollectionLayoutDimension.absolute(180) : NSCollectionLayoutDimension.absolute(120)
             var groupWidth =  NSCollectionLayoutDimension.fractionalWidth(1)
             
             if self.collectionView.frame.size.width > 500 || self.collectionView.frame.size.height > 1000{
@@ -328,16 +376,44 @@ extension ProfileVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSou
 }
 
 extension ProfileVC : JobPickedDelegate {
-    func didPickJob(_ isPicked: Bool) {
+    func didPickJob(_ isPicked: Bool, removeFrom indexPath: IndexPath) {
         
+    }
+    
+    func didChangePostStatus(for post: PostDetails,updateAt indexPath: IndexPath) {
+        posts[segment][indexPath.item] = post
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+        }
     }
 }
 
 
-extension ProfileVC: UISearchResultsUpdating{
+extension ProfileVC:  UISearchResultsUpdating, UISearchBarDelegate{
     
     func updateSearchResults(for searchController: UISearchController) {
-            
+        let searchText = searchController.searchBar.text ?? ""
+        if !searchText.isEmpty {
+            filteredPosts[segment] = posts[segment].filter({ (post) -> Bool in
+                (post.name.lowercased().contains(searchText.lowercased())) ||
+                (String(post.amount).contains(searchText)) ||
+                (post.description.lowercased().contains(searchText.lowercased()))
+            })
+            DispatchQueue.main.async { [weak self] in
+                self?.collectionView.reloadData()
+            }
+        }
+        
+    }
+    
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        let searchText = searchBar.text ?? ""
+        if searchText.isEmpty {
+            filteredPosts = posts
+            DispatchQueue.main.async { [weak self] in
+                self?.collectionView.reloadData()
+            }
+        }
     }
     
 }

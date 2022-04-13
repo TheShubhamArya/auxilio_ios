@@ -195,7 +195,7 @@ class CreatePostCVC: UIViewController {
             Post.taskType : newPost.taskType,
             Post.privacyAccess : newPost.allowLocationContactAccess,
             Post.post_id : newPost.post_id,
-            Post.postedBy : auth.currentUser?.uid,
+            Post.postedBy : auth.currentUser!.uid,
             Post.postStatus : newPost.postStatus,
             Post.pickedBy : "none",
             Post.imageURLs : newPost.imageURLs
@@ -428,8 +428,13 @@ extension CreatePostCVC: UIImagePickerControllerDelegate, UINavigationController
             return
         }
         
-        newPost.images.append(image)
-        
+        if let medImage = image.jpeg(.medium) {
+            if let uiimage = UIImage(data: medImage) {
+                let potraitImge  = uiimage.fixOrientation
+                newPost.images.append(potraitImge)
+            }
+        }
+    
         DispatchQueue.main.async {
             
             self.collectionView.reloadData()
@@ -458,8 +463,12 @@ extension CreatePostCVC : PHPickerViewControllerDelegate {
         for result in results {
             result.itemProvider.loadObject(ofClass: UIImage.self, completionHandler: { (object, error) in
                 if let image = object as? UIImage {
-                    let fixedImage = image.fixOrientation
-                    self.newPost.images.append(fixedImage)
+                    if let medImage = image.jpeg(.medium) {
+                        if let uiimage = UIImage(data: medImage) {
+                            let potraitImge  = uiimage.fixOrientation
+                            self.newPost.images.append(potraitImge)
+                        }
+                    }
                     DispatchQueue.main.async {
                         self.collectionView.reloadData()
                     }

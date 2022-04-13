@@ -33,6 +33,8 @@ class LabelTextViewCell: UITableViewCell {
         return tv
     }()
     
+    weak var user : UserDetails!
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         contentView.addSubViews(label, textView)
@@ -40,18 +42,23 @@ class LabelTextViewCell: UITableViewCell {
         textView.delegate = self
     }
     
-    public func configure(for indexPath: IndexPath, isEditable: Bool){
+    public func configure(for indexPath: IndexPath,_ user: UserDetails, isEditable: Bool){
+        self.user = user
         let row = indexPath.row
+        textView.tag = indexPath.item
         textView.keyboardType = .default
         textView.isEditable = isEditable
         if indexPath.section == 0 {
             if row == 0 {
                 label.text = "Name"
+                textView.text = user.name
             } else if row == 1 {
                 label.text = "Mobile #"
                 textView.keyboardType = .phonePad
+                textView.text = user.mobile
             } else if row == 2 {
                 label.text = "Address"
+                textView.text = user.address
             }
         }
     }
@@ -63,6 +70,7 @@ class LabelTextViewCell: UITableViewCell {
             label.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
             label.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
             label.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
+            label.widthAnchor.constraint(equalToConstant: 100),
             
             textView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
             textView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
@@ -82,6 +90,17 @@ extension LabelTextViewCell: UITextViewDelegate {
     func textViewDidChange(_ textView: UITextView) {
         if let deletate = cellDelegate {
             deletate.updateHeightOfRow(self, textView)
+        }
+    }
+    
+    func textViewDidEndEditing(_ textView: UITextView) {
+        let tag = textView.tag
+        if tag == 0 {
+            user.name = textView.text
+        } else if tag == 1 {
+            user.mobile = textView.text
+        } else if tag == 2 {
+            user.address = textView.text
         }
     }
 }

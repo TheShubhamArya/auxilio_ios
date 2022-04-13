@@ -97,7 +97,12 @@ class JobPostingCell: UICollectionViewCell {
 //                    }
 //                }
 //            }
-            jobImageView.image = UIImage(systemName: "exclamationmark.triangle")
+            if !post.images.isEmpty {
+                jobImageView.image = post.images.first
+            } else {
+                jobImageView.image = UIImage(systemName: "exclamationmark.triangle")
+            }
+            
         } else {
             jobImageView.image = UIImage(systemName: "exclamationmark.triangle")
         }

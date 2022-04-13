@@ -11,7 +11,7 @@ class JobImageCell: UICollectionViewCell {
     
     static let identifier = "jobImageCellIdentifier"
     
-    private let jobImage : UIImageView = {
+    let jobImage : UIImageView = {
         let iv = UIImageView()
         iv.contentMode = .scaleAspectFit
         return iv
@@ -27,19 +27,6 @@ class JobImageCell: UICollectionViewCell {
             jobImage.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 1),
             jobImage.heightAnchor.constraint(equalTo: contentView.heightAnchor, multiplier: 1)  
         ])
-    }
-    
-    public func configure(for urlString: String) {
-        print("url for image is \(urlString)")
-//        if let url = URL(string: urlString) {
-//            DispatchQueue.global().async {
-//                if let data = try? Data(contentsOf: url) {
-//                    DispatchQueue.main.async {
-//                        self.jobImage.image = UIImage(data: data)
-//                    }
-//                }
-//            }
-//        }
     }
     
     required init?(coder: NSCoder) {
